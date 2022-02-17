@@ -5,44 +5,42 @@ import '../../util/utils_functions.dart';
 import '../classes/repository.dart';
 import '../widgets/dialog_alert_error.dart';
 
-class EditCategory extends StatefulWidget {
+class EditRepository extends StatefulWidget {
 
   @override
-  _EditCategoryState createState() => _EditCategoryState();
+  _EditRepositoryState createState() => _EditRepositoryState();
 
   Repository repository;
-  EditCategory({Key? key,required this.repository}) : super(key: key);
+  EditRepository({Key? key,required this.repository}) : super(key: key);
 }
 
-class _EditCategoryState extends State<EditCategory> {
+class _EditRepositoryState extends State<EditRepository> {
 
-  final _categories = RepositoryDao.instance;
-  TextEditingController customControllerName = TextEditingController();
+  final _repositories = RepositoryDao.instance;
+  TextEditingController customControllerRepoLink = TextEditingController();
 
 
   @override
   void initState() {
     super.initState();
-    //customControllerName.text = widget.repository.name;
+    customControllerRepoLink.text = widget.repository.link!;
   }
 
-  void _updateTag() async {
+  void _updateRepository() async {
     Map<String, dynamic> row = {
       RepositoryDao.columnId: widget.repository.id,
-      RepositoryDao.columnName: customControllerName.text,
-
+      RepositoryDao.columnLink: customControllerRepoLink.text,
     };
-    final update = await _categories.update(row);
+    final update = await _repositories.update(row);
   }
 
   String checkForErrors() {
     String errors = "";
-    if (customControllerName.text.isEmpty) {
-      errors += "Name is empty\n";
+    if (customControllerRepoLink.text.isEmpty) {
+      errors += "Link is empty\n";
     }
     return errors;
   }
-
 
 
   @override
@@ -60,7 +58,7 @@ class _EditCategoryState extends State<EditCategory> {
               onPressed: () async {
                 String errors = checkForErrors();
                 if (errors.isEmpty) {
-                  _updateTag();
+                  _updateRepository();
                   Navigator.of(context).pop();
                 } else {
                   showDialog(
@@ -74,7 +72,7 @@ class _EditCategoryState extends State<EditCategory> {
             ),
           )
         ],
-        title: const Text('New Tag'),
+        title: const Text('Edit Repository'),
       ),
       body: ListView(
         children: [
@@ -82,7 +80,7 @@ class _EditCategoryState extends State<EditCategory> {
             leading: const SizedBox(
               height: 0.1,
             ),
-            title: Text("Name".toUpperCase(),
+            title: Text("Repository Link".toUpperCase(),
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -94,9 +92,9 @@ class _EditCategoryState extends State<EditCategory> {
             ),
             title: TextField(
               minLines: 1,
-              maxLength: 30,
+              maxLength: 150,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              controller: customControllerName,
+              controller: customControllerRepoLink,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 border: InputBorder.none,

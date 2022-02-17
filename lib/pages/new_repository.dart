@@ -12,21 +12,20 @@ class NewRepository extends StatefulWidget {
 
 class _NewRepositoryState extends State<NewRepository> {
 
-  final _categories = RepositoryDao.instance;
-  TextEditingController customControllerName = TextEditingController();
+  final _repositories = RepositoryDao.instance;
+  TextEditingController customControllerRepoLink = TextEditingController();
 
-  void _saveTag() async {
+  void _saveRepository() async {
     Map<String, dynamic> row = {
-      RepositoryDao.columnName: customControllerName.text,
-      //RepositoryDao.columnColor: currentColor.toString(),
+      RepositoryDao.columnLink: customControllerRepoLink.text,
     };
-    final id = await _categories.insert(row);
+    final id = await _repositories.insert(row);
   }
 
   String checkForErrors() {
     String errors = "";
-    if (customControllerName.text.isEmpty) {
-      errors += "Name is empty\n";
+    if (customControllerRepoLink.text.isEmpty) {
+      errors += "Link is empty\n";
     }
     return errors;
   }
@@ -46,7 +45,7 @@ class _NewRepositoryState extends State<NewRepository> {
               onPressed: () async {
                 String errors = checkForErrors();
                 if (errors.isEmpty) {
-                  _saveTag();
+                  _saveRepository();
                   Navigator.of(context).pop();
                 } else {
                   showDialog(
@@ -60,7 +59,7 @@ class _NewRepositoryState extends State<NewRepository> {
             ),
           )
         ],
-        title: const Text('New Tag'),
+        title: const Text('New Repository'),
       ),
       body: ListView(
         children: [
@@ -68,7 +67,7 @@ class _NewRepositoryState extends State<NewRepository> {
             leading: const SizedBox(
               height: 0.1,
             ),
-            title: Text("Name".toUpperCase(),
+            title: Text("Repository Link".toUpperCase(),
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -81,9 +80,9 @@ class _NewRepositoryState extends State<NewRepository> {
             title: TextField(
               autofocus: true,
               minLines: 1,
-              maxLength: 30,
+              maxLength: 150,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              controller: customControllerName,
+              controller: customControllerRepoLink,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 border: InputBorder.none,
