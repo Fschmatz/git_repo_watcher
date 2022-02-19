@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
-import 'package:git_repo_watcher/pages/edit_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../classes/release.dart';
 import '../db/repository_dao.dart';
 
 class RepositoryTile extends StatefulWidget {
@@ -19,14 +19,7 @@ class RepositoryTile extends StatefulWidget {
 }
 
 class _RepositoryTileState extends State<RepositoryTile> {
-  Repository repo = Repository(
-      id: null,
-      owner: '',
-      createdDate: '',
-      link: '',
-      name: '',
-      lastUpdate: '',
-      idGit: null);
+  late Repository _repo;
   String repoApi = 'https://api.github.com/repos/';
   bool loadingData = false;
   List<String> formattedRepositoryData = [];
@@ -37,37 +30,50 @@ class _RepositoryTileState extends State<RepositoryTile> {
   void initState() {
     super.initState();
     formattedRepositoryData = widget.repository.link!.split('/');
-    repo = widget.repository;
+    _repo = widget.repository;
   }
 
   Future<void> getRepositoryData() async {
-    final response = await http.get(Uri.parse("https://api.github.com/repos/" +
+
+    //REPO
+    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" +
         formattedRepositoryData[3] +
         "/" +
         formattedRepositoryData[4]));
 
-    print("https://api.github.com/repos/" +
+    //RELEASE
+    final responseRelease = await http.get(Uri.parse("https://api.github.com/repos/" +
         formattedRepositoryData[3] +
         "/" +
-        formattedRepositoryData[4]);
-    print(response.statusCode.toString());
+        formattedRepositoryData[4]+"/releases/latest"));
 
-    if (response.statusCode == 200) {
+    if (responseRepo.statusCode == 200) {
+
+      _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
+      Release _release = Release.fromJSON(jsonDecode(responseRelease.body));
+      _repo.releaseLink = _release.link;
+      _repo.releaseVersion = _release.version;
+      _repo.releasePublishedDate = _release.publishedDate;
+      _repo.id = widget.repository.id;
+
+      print(_repo.toString());
+      _update();
+
       if (mounted) {
         setState(() {
           loadingData = false;
-          repo = Repository.fromJSON(jsonDecode(response.body));
+          _repo;
         });
       }
-    } else if (response.statusCode == 403) {
+    } else if (responseRepo.statusCode == 403) {
       Fluttertoast.showToast(
         msg: "API Limit",
       );
-    } else if (response.statusCode == 404) {
-      repo.name = "Link Error";
+    } else if (responseRepo.statusCode == 404) {
+      _repo.name = "Link Error";
       setState(() {
         loadingData = false;
-        repo;
+        _repo;
       });
       Fluttertoast.showToast(
         msg: "Error Loading",
@@ -79,8 +85,23 @@ class _RepositoryTileState extends State<RepositoryTile> {
     }
   }
 
-  _launchPage() {
-    String url = widget.repository.link!;
+  void _update() async {
+    final repositories = RepositoryDao.instance;
+    Map<String, dynamic> row = {
+      RepositoryDao.columnId: _repo.id,
+      RepositoryDao.columnReleaseLink: _repo.releaseLink,
+      RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
+      RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
+    };
+    final update = await repositories.update(row);
+  }
+
+  Future<void> _delete() async {
+    final repositories = RepositoryDao.instance;
+    final deleted = await repositories.delete(_repo.id!);
+  }
+
+  _launchPage(String url) {
     launch(url);
   }
 
@@ -101,32 +122,30 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   ListTile(
                     leading: const Icon(Icons.open_in_new_outlined),
                     title: const Text(
-                      "Open in browser",
+                      "View repository",
                       style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
-                      _launchPage();
+                      _launchPage(widget.repository.link!);
                     },
                   ),
                   const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.edit_outlined),
-                    title: const Text(
-                      "Edit",
-                      style: TextStyle(fontSize: 16),
+                  Visibility(
+                    visible: _repo.releasePublishedDate!.isNotEmpty,
+                    child: ListTile(
+                      leading: const Icon(Icons.open_in_new_outlined),
+                      title: const Text(
+                        "View latest release",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      onTap: () {
+                        _launchPage(widget.repository.releaseLink!);
+                      },
                     ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    /*  Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                EditRepository(repository: widget.repository),
-                            fullscreenDialog: true,
-                          ));*/
-                    },
                   ),
-                  const Divider(),
+                  Visibility(
+                      visible: _repo.releasePublishedDate!.isNotEmpty,
+                      child: const Divider()),
                   ListTile(
                     leading: const Icon(Icons.delete_outline_outlined),
                     title: const Text(
@@ -144,10 +163,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
         });
   }
 
-  Future<void> _delete() async {
-    final repositories = RepositoryDao.instance;
-    final deleted = await repositories.delete(widget.repository.id!);
-  }
+
 
   showAlertDialogOkDelete(BuildContext context) {
     Widget okButton = TextButton(
@@ -156,7 +172,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
         style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).accentColor),
+            color: Theme.of(context).colorScheme.primary),
       ),
       onPressed: () {
         Navigator.of(context).pop();
@@ -192,51 +208,43 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: openBottomMenu,
-      onLongPress: getRepositoryData,
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(repo.name!,style: const TextStyle(fontWeight: FontWeight.w600),),
-            subtitle: Text(repo.owner!),
-          ),
-         /* const ListTile(
-            title: Text("Latest release"),
-            trailing: const Text("06/06/2666"),
-          ),*/
-          Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Card(
+        child: InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          onTap: openBottomMenu,
+          onLongPress: getRepositoryData,
+          child: Column(
             children: [
-             /* Expanded(
-                child: ListTile(
-                  title: const Text("Creation date"),
-                  //trailing: Text(repo.createdDate!),
-                  subtitle: Text(repo.createdDate!),
+              ListTile(
+                title: Text(
+                  _repo.name!,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w700),
                 ),
-              ),*/
-
-              Expanded(
-                child: ListTile(
-                  title: const Text("Last update"),
-
-                  //Jiffy(data).format("dd/MM/yyyy"),
-
-                  subtitle: Text(Jiffy(repo.lastUpdate!).format("dd/MM/yyyy"))
-                  //trailing: Text(repo.lastUpdate!),
-                ),
+                subtitle: Text(_repo.owner!),
               ),
-              const Expanded(
+              ListTile(
+                  title: const Text("Latest update"),
+                  trailing:
+                  Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
+              Visibility(
+                visible: _repo.releasePublishedDate != 'null',
                 child: ListTile(
-                  title: Text("Latest release"),
-                  subtitle: Text("06/06/2666"),
+                  title: const Text("Latest release "),
+                  subtitle: Text(_repo.releaseVersion!),
+                  trailing: _repo.releasePublishedDate == 'null'
+                      ? const Text('No releases')
+                      : Text(Jiffy(_repo.releasePublishedDate!)
+                      .format("dd/MM/yyyy")),
                   //trailing: Text(repo.lastUpdate!),
                 ),
               ),
             ],
           ),
-
-
-        ],
+        ),
       ),
     );
   }

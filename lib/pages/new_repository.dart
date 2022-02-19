@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../db/repository_dao.dart';
+import '../classes/release.dart';
 import '../classes/repository.dart';
 import '../widgets/dialog_alert_error.dart';
 import 'package:http/http.dart' as http;
@@ -18,14 +19,8 @@ class NewRepository extends StatefulWidget {
 }
 
 class _NewRepositoryState extends State<NewRepository> {
-  Repository repo = Repository(
-    id: null,
-      owner: '',
-      createdDate: '',
-      link: '',
-      name: '',
-      lastUpdate: '',
-      idGit: null);
+  late Repository _repo;
+  late Release _release;
   final _repositories = RepositoryDao.instance;
   TextEditingController customControllerRepoLink = TextEditingController();
 
@@ -34,19 +29,27 @@ class _NewRepositoryState extends State<NewRepository> {
     List<String> formattedRepositoryData =
         customControllerRepoLink.text.split('/');
 
-    final response = await http.get(Uri.parse("https://api.github.com/repos/" +
+    //REPO
+    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" +
         formattedRepositoryData[3] +
         "/" +
         formattedRepositoryData[4]));
-/*
-    print("https://api.github.com/repos/" +
+
+    //RELEASE
+    final responseRelease = await http.get(Uri.parse("https://api.github.com/repos/" +
         formattedRepositoryData[3] +
         "/" +
-        formattedRepositoryData[4]);
-    print(response.statusCode.toString());*/
+        formattedRepositoryData[4]+"/releases/latest"));
 
-    if (response.statusCode == 200) {
-      repo = Repository.fromJSON(jsonDecode(response.body));
+
+    if (responseRepo.statusCode == 200) {
+
+      _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
+      _release = Release.fromJSON(jsonDecode(responseRelease.body));
+      _repo.releaseLink = _release.link;
+      _repo.releaseVersion = _release.version;
+      _repo.releasePublishedDate = _release.publishedDate;
+
       _saveRepository();
       widget.refreshList();
     } else {
@@ -58,12 +61,16 @@ class _NewRepositoryState extends State<NewRepository> {
 
   void _saveRepository() async {
     Map<String, dynamic> row = {
-      RepositoryDao.columnName: repo.name,
+      RepositoryDao.columnName: _repo.name,
       RepositoryDao.columnLink: customControllerRepoLink.text,
-      RepositoryDao.columnIdGit: repo.idGit,
-      RepositoryDao.columnOwner: repo.owner,
-      RepositoryDao.columnCreatedDate: repo.createdDate,
-      RepositoryDao.columnlastUpdate: repo.lastUpdate,
+      RepositoryDao.columnIdGit: _repo.idGit,
+      RepositoryDao.columnOwner: _repo.owner,
+      RepositoryDao.columnCreatedDate: _repo.createdDate,
+      RepositoryDao.columnLastUpdate: _repo.lastUpdate,
+
+      RepositoryDao.columnReleaseLink: _repo.releaseLink,
+      RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
+      RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
     };
     final id = await _repositories.insert(row);
   }

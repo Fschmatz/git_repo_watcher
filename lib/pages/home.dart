@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
                 children: [
                     ListView.separated(
                       separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(height: 0,),
+                          const SizedBox(height: 10,),
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: repositoriesList.length,
@@ -92,7 +92,15 @@ class _HomeState extends State<Home> {
                                 lastUpdate: repositoriesList[index]
                                     ['lastUpdate'],
                                 createdDate: repositoriesList[index]
-                                    ['createdDate']));
+                                    ['createdDate'],
+                              releaseLink: repositoriesList[index]
+                              ['releaseLink'],
+                              releaseVersion: repositoriesList[index]
+                              ['releaseVersion'],
+                              releasePublishedDate: repositoriesList[index]
+                              ['releasePublishedDate'],
+                            ),
+                        );
                       },
                     ),
                     const SizedBox(

@@ -1,16 +1,23 @@
 class Changelog{
 
-  static String appVersion = "0.5.0";
+  static String appVersion = "1.0.0";
   static String appName = "Git Repo Watcher Fschmatz";
 
   static String changelogCurrent = ''' 
+1.0.0
+- Technically Usable
+''';
+
+  static String changelogsOld = '''  
+0.6.0
+- Release Data
+- Bug Fixes
+
 0.5.0
 - UI Changes
 - Bottom Sheet
 - Delete repository
-''';
 
-  static String changelogsOld = '''  
 0.4.0
 - Save repository
 

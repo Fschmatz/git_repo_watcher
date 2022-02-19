@@ -13,8 +13,11 @@ class RepositoryDao {
   static const columnLink = 'link';
   static const columnIdGit = 'idGit';
   static const columnOwner = 'owner';
-  static const columnlastUpdate = 'lastUpdate';
+  static const columnLastUpdate = 'lastUpdate';
   static const columnCreatedDate = 'createdDate';
+  static const columnReleaseLink = 'releaseLink';
+  static const columnReleaseVersion = 'releaseVersion';
+  static const columnReleasePublishedDate = 'releasePublishedDate';
 
   static Database? _database;
 
@@ -39,8 +42,11 @@ class RepositoryDao {
            $columnLink TEXT NOT NULL,  
            $columnIdGit TEXT NOT NULL,  
            $columnOwner TEXT NOT NULL,  
-           $columnlastUpdate TEXT NOT NULL,  
-           $columnCreatedDate TEXT NOT NULL                    
+           $columnLastUpdate ,  
+           $columnCreatedDate ,
+           $columnReleaseLink ,  
+           $columnReleaseVersion ,  
+           $columnReleasePublishedDate                      
           )
           ''');
   }

@@ -23,4 +23,8 @@ class Release{
     );
   }
 
+  @override
+  String toString() {
+    return 'Release{link: $link, version: $version, publishedDate: $publishedDate}';
+  }
 }

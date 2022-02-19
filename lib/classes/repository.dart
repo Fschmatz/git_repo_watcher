@@ -9,15 +9,21 @@ class Repository{
   String? link;
   String? lastUpdate;
   String? createdDate;
+  String? releaseLink;
+  String? releaseVersion;
+  String? releasePublishedDate;
 
   Repository({
-    required this.id,
+    this.id,
     required this.idGit,
     required this.name,
     required this.link,
     required this.owner,
     required this.lastUpdate,
     required this.createdDate,
+    this.releaseLink,
+    this.releaseVersion,
+    this.releasePublishedDate
   });
 
   factory Repository.fromJSON(dynamic json) {
@@ -25,7 +31,6 @@ class Repository{
     final value = DynamicValue(json);
 
     return Repository(
-      id: null,
       idGit: value['id'].toInt,
       name: value['name'].toString(),
       link: value['svn_url'].toString(),
@@ -37,6 +42,6 @@ class Repository{
 
   @override
   String toString() {
-    return 'Repository{idGit: $idGit, name: $name, owner: $owner, link: $link, lastUpdate: $lastUpdate, createdDate: $createdDate}';
+    return 'Repository{id: $id, idGit: $idGit, name: $name, owner: $owner, link: $link, lastUpdate: $lastUpdate, createdDate: $createdDate, releaseLink: $releaseLink, releaseVersion: $releaseVersion, releasePublishedDate: $releasePublishedDate}';
   }
 }
