@@ -104,9 +104,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     ));
               },
             ),
-            const SizedBox(
-              height: 10.0,
-            ),
             ListTile(
               leading: const Icon(
                 Icons.article_outlined,
@@ -123,6 +120,26 @@ class _SettingsPageState extends State<SettingsPage> {
                       fullscreenDialog: true,
                     ));
               },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const SizedBox(height: 0.1,),
+              title: Text(
+                  "Alert".toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: themeColorApp)
+              ),
+            ),
+            const ListTile(
+              leading:  Icon(
+                Icons.report_problem_outlined,
+              ),
+              title: Text(
+                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item).",
+                style: TextStyle(fontSize: 16),
+              ),
             ),
           ],
         ));

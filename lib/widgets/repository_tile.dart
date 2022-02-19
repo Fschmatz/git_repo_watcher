@@ -5,7 +5,6 @@ import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../classes/release.dart';
 import '../db/repository_dao.dart';
 
@@ -62,7 +61,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
       _repo.releasePublishedDate = _release.publishedDate;
       _repo.id = widget.repository.id;
 
-      print(_repo.toString());
       checkUpdate();
       _update();
 
@@ -141,12 +139,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
+                      Navigator.of(context).pop();
                       _launchPage(widget.repository.link!);
                     },
                   ),
                   const Divider(),
                   Visibility(
-                    visible: _repo.releasePublishedDate!.isNotEmpty,
+                    visible: _repo.releasePublishedDate! != 'null',
                     child: ListTile(
                       leading: const Icon(Icons.open_in_new_outlined),
                       title: const Text(
@@ -154,12 +153,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
                         style: TextStyle(fontSize: 16),
                       ),
                       onTap: () {
+                        Navigator.of(context).pop();
                         _launchPage(widget.repository.releaseLink!);
                       },
                     ),
                   ),
                   Visibility(
-                      visible: _repo.releasePublishedDate!.isNotEmpty,
+                      visible: _repo.releasePublishedDate! != 'null',
                       child: const Divider()),
                   ListTile(
                     leading: const Icon(Icons.delete_outline_outlined),
@@ -223,49 +223,44 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Card(
-        child: InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-          onTap: openBottomMenu,
-          onLongPress: getRepositoryData,
-          child: Column(
-            children: [
-              ListTile(
-                title: Text(
-                  _repo.name!,
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700),
-                ),
-                subtitle: Text(_repo.owner!),
-                trailing: Visibility(
-                    visible: newVersion,
-                    child: Icon(
-                      Icons.new_releases_outlined,
-                      color: Theme.of(context).colorScheme.primary,
-                    )),
-              ),
-              ListTile(
-                  title: const Text("Latest update"),
-                  trailing:
-                      Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
-              Visibility(
-                visible: _repo.releasePublishedDate != 'null',
-                child: ListTile(
-                  title: const Text("Latest release "),
-                  subtitle: Text(_repo.releaseVersion!),
-                  trailing: _repo.releasePublishedDate == 'null'
-                      ? const Text('No releases')
-                      : Text(Jiffy(_repo.releasePublishedDate!)
-                          .format("dd/MM/yyyy")),
-                  //trailing: Text(repo.lastUpdate!),
-                ),
-              ),
-            ],
+    return InkWell(
+      onTap: openBottomMenu,
+      onLongPress: getRepositoryData,
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.folder_shared_outlined),
+            title: Text(
+              _repo.name!,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w700),
+            ),
+            subtitle: Text(_repo.owner!),
+            trailing: Visibility(
+                visible: newVersion,
+                child: Icon(
+                  Icons.new_releases_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                )),
           ),
-        ),
+          ListTile(
+              title: const Text("Latest update"),
+              trailing:
+                  Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
+          Visibility(
+            visible: _repo.releasePublishedDate != 'null',
+            child: ListTile(
+              title: const Text("Latest release "),
+              subtitle: Text(_repo.releaseVersion!),
+              trailing: _repo.releasePublishedDate == 'null'
+                  ? const Text('No releases')
+                  : Text(Jiffy(_repo.releasePublishedDate!)
+                      .format("dd/MM/yyyy")),
+              //trailing: Text(repo.lastUpdate!),
+            ),
+          ),
+        ],
       ),
     );
   }
