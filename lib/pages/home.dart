@@ -3,7 +3,7 @@ import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/db/repository_dao.dart';
 import 'package:git_repo_watcher/pages/new_repository.dart';
 import 'package:git_repo_watcher/pages/settings/settings_page.dart';
-import 'package:git_repo_watcher/widgets/repository_card.dart';
+import 'package:git_repo_watcher/widgets/repository_tile.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -46,7 +46,7 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const NewRepository(),
+                      builder: (BuildContext context) => NewRepository(refreshList: getAllSavedRepositories,),
                       fullscreenDialog: true,
                     ));
               }),
@@ -74,18 +74,25 @@ class _HomeState extends State<Home> {
             : ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                    ListView.builder(
+                    ListView.separated(
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(height: 0,),
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: repositoriesList.length,
                       itemBuilder: (context, index) {
-                        return RepositoryCard(
+                        return RepositoryTile(
                             key: UniqueKey(),
                             repository: Repository(
-                              id: repositoriesList[index]['id'],
-                              link: repositoriesList[index]['link'],
-                              name: repositoriesList[index]['link'],
-                            ));
+                                id: repositoriesList[index]['id'],
+                                name: repositoriesList[index]['name'],
+                                link: repositoriesList[index]['link'],
+                                idGit: int.parse(repositoriesList[index]['idGit']),
+                                owner: repositoriesList[index]['owner'],
+                                lastUpdate: repositoriesList[index]
+                                    ['lastUpdate'],
+                                createdDate: repositoriesList[index]
+                                    ['createdDate']));
                       },
                     ),
                     const SizedBox(

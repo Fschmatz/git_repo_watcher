@@ -9,9 +9,12 @@ class RepositoryDao {
 
   static const table = 'repositories';
   static const columnId = 'id';
-
-  //static const columnName = 'name';
+  static const columnName = 'name';
   static const columnLink = 'link';
+  static const columnIdGit = 'idGit';
+  static const columnOwner = 'owner';
+  static const columnlastUpdate = 'lastUpdate';
+  static const columnCreatedDate = 'createdDate';
 
   static Database? _database;
 
@@ -32,7 +35,12 @@ class RepositoryDao {
     await db.execute('''
           CREATE TABLE $table (
            $columnId INTEGER PRIMARY KEY,
-           $columnLink TEXT NOT NULL           
+           $columnName TEXT NOT NULL, 
+           $columnLink TEXT NOT NULL,  
+           $columnIdGit TEXT NOT NULL,  
+           $columnOwner TEXT NOT NULL,  
+           $columnlastUpdate TEXT NOT NULL,  
+           $columnCreatedDate TEXT NOT NULL                    
           )
           ''');
   }

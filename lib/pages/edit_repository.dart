@@ -28,7 +28,7 @@ class _EditRepositoryState extends State<EditRepository> {
 
   void _updateRepository() async {
     Map<String, dynamic> row = {
-      RepositoryDao.columnId: widget.repository.id,
+      RepositoryDao.columnId: widget.repository.idGit,
       RepositoryDao.columnLink: customControllerRepoLink.text,
     };
     final update = await _repositories.update(row);

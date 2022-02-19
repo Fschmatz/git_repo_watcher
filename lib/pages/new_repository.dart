@@ -1,23 +1,69 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../db/repository_dao.dart';
+import '../classes/repository.dart';
 import '../widgets/dialog_alert_error.dart';
+import 'package:http/http.dart' as http;
 
 class NewRepository extends StatefulWidget {
+  Function refreshList;
+
   @override
   _NewRepositoryState createState() => _NewRepositoryState();
 
-  const NewRepository({Key? key}) : super(key: key);
+  NewRepository({Key? key,required this.refreshList}) : super(key: key);
 }
 
 class _NewRepositoryState extends State<NewRepository> {
-
+  Repository repo = Repository(
+    id: null,
+      owner: '',
+      createdDate: '',
+      link: '',
+      name: '',
+      lastUpdate: '',
+      idGit: null);
   final _repositories = RepositoryDao.instance;
   TextEditingController customControllerRepoLink = TextEditingController();
 
+
+  Future<void> getRepositoryDataAndSave() async {
+    List<String> formattedRepositoryData =
+        customControllerRepoLink.text.split('/');
+
+    final response = await http.get(Uri.parse("https://api.github.com/repos/" +
+        formattedRepositoryData[3] +
+        "/" +
+        formattedRepositoryData[4]));
+/*
+    print("https://api.github.com/repos/" +
+        formattedRepositoryData[3] +
+        "/" +
+        formattedRepositoryData[4]);
+    print(response.statusCode.toString());*/
+
+    if (response.statusCode == 200) {
+      repo = Repository.fromJSON(jsonDecode(response.body));
+      _saveRepository();
+      widget.refreshList();
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error Saving Repository Data",
+      );
+    }
+  }
+
   void _saveRepository() async {
     Map<String, dynamic> row = {
+      RepositoryDao.columnName: repo.name,
       RepositoryDao.columnLink: customControllerRepoLink.text,
+      RepositoryDao.columnIdGit: repo.idGit,
+      RepositoryDao.columnOwner: repo.owner,
+      RepositoryDao.columnCreatedDate: repo.createdDate,
+      RepositoryDao.columnlastUpdate: repo.lastUpdate,
     };
     final id = await _repositories.insert(row);
   }
@@ -45,13 +91,13 @@ class _NewRepositoryState extends State<NewRepository> {
               onPressed: () async {
                 String errors = checkForErrors();
                 if (errors.isEmpty) {
-                  _saveRepository();
+                  getRepositoryDataAndSave();
                   Navigator.of(context).pop();
                 } else {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return  dialogAlertErrors(errors,context);
+                      return dialogAlertErrors(errors, context);
                     },
                   );
                 }
@@ -94,7 +140,6 @@ class _NewRepositoryState extends State<NewRepository> {
               ),
             ),
           ),
-
         ],
       ),
     );
