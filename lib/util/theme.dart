@@ -19,7 +19,7 @@ ThemeData light = ThemeData(
             color: Color(0xFF000000))),
     scaffoldBackgroundColor: const Color(0xFFFFFDFF),
     cardTheme: const CardTheme(
-      color: Color(0xFFF9F7FA),
+      color: Color(0xFFF8F5FA),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
@@ -80,7 +80,7 @@ ThemeData dark = ThemeData(
             fontWeight: FontWeight.w600,
             color: Color(0xFFFFFFFF))),
     cardTheme: const CardTheme(
-      color: Color(0xFF323036),
+      color: Color(0xFF2B292F),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),

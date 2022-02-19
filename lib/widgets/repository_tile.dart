@@ -11,8 +11,11 @@ import '../db/repository_dao.dart';
 
 class RepositoryTile extends StatefulWidget {
   Repository repository;
+  Function refreshList;
 
-  RepositoryTile({Key? key, required this.repository}) : super(key: key);
+  RepositoryTile(
+      {Key? key, required this.repository, required this.refreshList})
+      : super(key: key);
 
   @override
   _RepositoryTileState createState() => _RepositoryTileState();
@@ -23,32 +26,35 @@ class _RepositoryTileState extends State<RepositoryTile> {
   String repoApi = 'https://api.github.com/repos/';
   bool loadingData = false;
   List<String> formattedRepositoryData = [];
-
+  bool newVersion = false;
   String savedLink = '';
+  String oldDate = '';
 
   @override
   void initState() {
     super.initState();
     formattedRepositoryData = widget.repository.link!.split('/');
     _repo = widget.repository;
+    oldDate = widget.repository.releasePublishedDate!;
   }
 
   Future<void> getRepositoryData() async {
-
     //REPO
-    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" +
-        formattedRepositoryData[3] +
-        "/" +
-        formattedRepositoryData[4]));
+    final responseRepo = await http.get(Uri.parse(
+        "https://api.github.com/repos/" +
+            formattedRepositoryData[3] +
+            "/" +
+            formattedRepositoryData[4]));
 
     //RELEASE
-    final responseRelease = await http.get(Uri.parse("https://api.github.com/repos/" +
-        formattedRepositoryData[3] +
-        "/" +
-        formattedRepositoryData[4]+"/releases/latest"));
+    final responseRelease = await http.get(Uri.parse(
+        "https://api.github.com/repos/" +
+            formattedRepositoryData[3] +
+            "/" +
+            formattedRepositoryData[4] +
+            "/releases/latest"));
 
     if (responseRepo.statusCode == 200) {
-
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
       Release _release = Release.fromJSON(jsonDecode(responseRelease.body));
       _repo.releaseLink = _release.link;
@@ -57,6 +63,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
       _repo.id = widget.repository.id;
 
       print(_repo.toString());
+      checkUpdate();
       _update();
 
       if (mounted) {
@@ -99,6 +106,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Future<void> _delete() async {
     final repositories = RepositoryDao.instance;
     final deleted = await repositories.delete(_repo.id!);
+  }
+
+  void checkUpdate() {
+    if (oldDate != _repo.releasePublishedDate) {
+      setState(() {
+        newVersion = !newVersion;
+      });
+    }
   }
 
   _launchPage(String url) {
@@ -163,8 +178,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
         });
   }
 
-
-
   showAlertDialogOkDelete(BuildContext context) {
     Widget okButton = TextButton(
       child: Text(
@@ -176,7 +189,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
       ),
       onPressed: () {
         Navigator.of(context).pop();
+        Navigator.of(context).pop();
         _delete();
+        widget.refreshList();
       },
     );
 
@@ -225,11 +240,17 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       fontWeight: FontWeight.w700),
                 ),
                 subtitle: Text(_repo.owner!),
+                trailing: Visibility(
+                    visible: newVersion,
+                    child: Icon(
+                      Icons.new_releases_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
               ),
               ListTile(
                   title: const Text("Latest update"),
                   trailing:
-                  Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
+                      Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
               Visibility(
                 visible: _repo.releasePublishedDate != 'null',
                 child: ListTile(
@@ -238,7 +259,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   trailing: _repo.releasePublishedDate == 'null'
                       ? const Text('No releases')
                       : Text(Jiffy(_repo.releasePublishedDate!)
-                      .format("dd/MM/yyyy")),
+                          .format("dd/MM/yyyy")),
                   //trailing: Text(repo.lastUpdate!),
                 ),
               ),

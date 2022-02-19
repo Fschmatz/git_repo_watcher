@@ -11,6 +11,7 @@ class Changelog{
   static String changelogsOld = '''  
 0.6.0
 - Release Data
+- Release Link
 - Bug Fixes
 
 0.5.0

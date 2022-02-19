@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
                     ));
               }),
           const SizedBox(
-            width: 8,
+            width: 10,
           ),
           IconButton(
               icon: const Icon(
@@ -83,6 +83,7 @@ class _HomeState extends State<Home> {
                       itemBuilder: (context, index) {
                         return RepositoryTile(
                             key: UniqueKey(),
+                          refreshList: getAllSavedRepositories,
                             repository: Repository(
                                 id: repositoriesList[index]['id'],
                                 name: repositoriesList[index]['name'],
