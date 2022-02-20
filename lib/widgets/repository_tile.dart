@@ -182,12 +182,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   showAlertDialogOkDelete(BuildContext context) {
     Widget okButton = TextButton(
-      child: Text(
+      child: const Text(
         "Yes",
-        style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary),
       ),
       onPressed: () {
         Navigator.of(context).pop();
@@ -202,14 +198,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
       title: const Text(
-        "Confirm", //
-        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+        "Confirm",
       ),
       content: const Text(
-        "\nDelete ?",
-        style: TextStyle(
-          fontSize: 18,
-        ),
+        "Delete ?",
       ),
       actions: [
         okButton,
