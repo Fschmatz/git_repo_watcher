@@ -6,7 +6,7 @@ ThemeData light = ThemeData(
     primaryColor: const Color(0xFFFCFDFF),
     colorScheme: const ColorScheme.light(
       primary: Color(0xFF00B5AD),
-      onSecondary: Color(0xFF00B5AD),
+      onSecondary: Color(0xFF00A6B5),
       secondary: Color(0xFF00B5AD),
     ),
     appBarTheme: const AppBarTheme(
@@ -31,8 +31,6 @@ ThemeData light = ThemeData(
       backgroundColor: Color(0xFF00B5AD),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFFF5F6F8),
         focusColor:  const Color(0xFF00B5AD),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
@@ -65,22 +63,22 @@ ThemeData light = ThemeData(
 ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFF1B2129),
-    scaffoldBackgroundColor: const Color(0xFF1B2129),
+    primaryColor: const Color(0xFF1C2126),
+    scaffoldBackgroundColor: const Color(0xFF1C2126),
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFF54C4B3),//0xFF54C4B3
-      onSecondary: Color(0xFF54C4B3),
+      onSecondary: Color(0xFF22B0D4),
       secondary: Color(0xFF54C4B3),
     ),
     appBarTheme: const AppBarTheme(
-        color: Color(0xFF1B2129),
+        color: Color(0xFF1C2126),
         elevation: 0,
         titleTextStyle: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Color(0xFFFFFFFF))),
     cardTheme: const CardTheme(
-      color: Color(0xFF1B2129),
+      color: Color(0xFF1C2126),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
@@ -89,8 +87,6 @@ ThemeData dark = ThemeData(
       backgroundColor: Color(0xFF303136),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFF3B3139),
         focusColor: const Color(0xFF54C4B3),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
@@ -114,9 +110,9 @@ ThemeData dark = ThemeData(
       selectedLabelStyle: TextStyle(color: Color(0xFF54C4B3)),
       showSelectedLabels: false,
       showUnselectedLabels: false,
-      backgroundColor: Color(0xFF1B2129),
+      backgroundColor: Color(0xFF1C2126),
     ),
 
-    bottomAppBarColor: const Color(0xFF1B2129),
+    bottomAppBarColor: const Color(0xFF1C2126),
     bottomSheetTheme:
-    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1B2129)));
+    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1C2126)));

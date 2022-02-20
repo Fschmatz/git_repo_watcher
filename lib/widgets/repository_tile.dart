@@ -276,14 +276,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
                               fontSize: 12,
                               color: _tagTextBrightness == Brightness.dark
                                   ? lightenColor(
-                                      Theme.of(context).colorScheme.primary, 40)
+                                      Theme.of(context).colorScheme.onSecondary, 40)
                                   : darkenColor(
-                                      Theme.of(context).colorScheme.primary,
+                                      Theme.of(context).colorScheme.onSecondary,
                                       50),
                               fontWeight: FontWeight.w600),
                           backgroundColor: Theme.of(context)
                               .colorScheme
-                              .primary
+                              .onSecondary
                               .withOpacity(0.3),
                         ),
                       ),
