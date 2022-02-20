@@ -3,41 +3,41 @@ import 'package:flutter/material.dart';
 ThemeData light = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: const Color(0xFFFFFDFF),
+    primaryColor: const Color(0xFFFCFDFF),
     colorScheme: const ColorScheme.light(
-      primary: Colors.pink,
-      onSecondary: Colors.pink,
-      secondary: Colors.pink,
+      primary: Color(0xFF00B5AD),
+      onSecondary: Color(0xFF00B5AD),
+      secondary: Color(0xFF00B5AD),
     ),
     appBarTheme: const AppBarTheme(
-        color: Color(0xFFFFFDFF),
+        color: Color(0xFFFCFDFF),
         elevation: 0,
         iconTheme: IconThemeData(color: Color(0xFF000000)),
         titleTextStyle: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Color(0xFF000000))),
-    scaffoldBackgroundColor: const Color(0xFFFFFDFF),
+    scaffoldBackgroundColor: const Color(0xFFFCFDFF),
     cardTheme: const CardTheme(
-      color: Color(0xFFF8F5FA),
+      color: Color(0xFFFCFDFF),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
     dialogTheme: const DialogTheme(
-      backgroundColor: Color(0xFFFFFDFF),
+      backgroundColor: Color(0xFFFCFDFF),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Colors.pink,
+      backgroundColor: Color(0xFF00B5AD),
     ),
     inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFF0F0F0),
-        focusColor:  Colors.pink,
+        fillColor: const Color(0xFFF5F6F8),
+        focusColor:  const Color(0xFF00B5AD),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
-            color: Colors.pink,
+            color: Color(0xFF00B5AD),
           ),
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -53,34 +53,34 @@ ThemeData light = ThemeData(
             borderRadius: BorderRadius.circular(10.0))),
     bottomAppBarColor: const Color(0xFFE0E0E0),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme:  IconThemeData(color: Colors.pink,),
-      selectedLabelStyle: TextStyle(color: Colors.pink,),
+      selectedIconTheme:  IconThemeData(color: Color(0xFF00B5AD),),
+      selectedLabelStyle: TextStyle(color: Color(0xFF00B5AD),),
       showSelectedLabels: false,
       showUnselectedLabels: false,
-      backgroundColor: Color(0xFFFFFDFF),
+      backgroundColor: Color(0xFFFCFDFF),
     ),
     bottomSheetTheme:
-    const BottomSheetThemeData(modalBackgroundColor: Color(0xFFFFFDFF)));
+    const BottomSheetThemeData(modalBackgroundColor: Color(0xFFFCFDFF)));
 
 ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFF222026),
-    scaffoldBackgroundColor: const Color(0xFF222026),
+    primaryColor: const Color(0xFF1B2129),
+    scaffoldBackgroundColor: const Color(0xFF1B2129),
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFC695C9),
-      onSecondary: Color(0xFFC695C9),
-      secondary: Color(0xFFC695C9),
+      primary: Color(0xFF54C4B3),//0xFF54C4B3
+      onSecondary: Color(0xFF54C4B3),
+      secondary: Color(0xFF54C4B3),
     ),
     appBarTheme: const AppBarTheme(
-        color: Color(0xFF222026),
+        color: Color(0xFF1B2129),
         elevation: 0,
         titleTextStyle: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Color(0xFFFFFFFF))),
     cardTheme: const CardTheme(
-      color: Color(0xFF222026),
+      color: Color(0xFF1B2129),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
@@ -90,12 +90,12 @@ ThemeData dark = ThemeData(
     ),
     inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF303136),
-        focusColor: const Color(0xFFC695C9),
+        fillColor: const Color(0xFF3B3139),
+        focusColor: const Color(0xFF54C4B3),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
-            color: Color(0xFFC695C9),
+            color: Color(0xFF54C4B3),
           ),
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -110,13 +110,13 @@ ThemeData dark = ThemeData(
             ),
             borderRadius: BorderRadius.circular(10.0))),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme: IconThemeData(color: Color(0xFFC695C9)),
-      selectedLabelStyle: TextStyle(color: Color(0xFFC695C9)),
+      selectedIconTheme: IconThemeData(color: Color(0xFF54C4B3)),
+      selectedLabelStyle: TextStyle(color: Color(0xFF54C4B3)),
       showSelectedLabels: false,
       showUnselectedLabels: false,
-      backgroundColor: Color(0xFF222026),
+      backgroundColor: Color(0xFF1B2129),
     ),
 
-    bottomAppBarColor: const Color(0xFF222026),
+    bottomAppBarColor: const Color(0xFF1B2129),
     bottomSheetTheme:
-    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF222026)));
+    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1B2129)));

@@ -24,8 +24,7 @@ class _HomeState extends State<Home> {
 
   Future<void> getAllSavedRepositories() async {
     final repositories = RepositoryDao.instance;
-    var resp = await repositories.queryAllRowsDesc();
-
+    var resp = await repositories.queryAllRowsByName();
     setState(() {
       loading = false;
       repositoriesList = resp;
@@ -35,79 +34,87 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Git Repo Watcher'),
-        actions: [
-          IconButton(
-              icon: const Icon(
-                Icons.add_outlined,
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => NewRepository(refreshList: getAllSavedRepositories,),
-                      fullscreenDialog: true,
-                    ));
-              }),
-          const SizedBox(
-            width: 10,
-          ),
-          IconButton(
-              icon: const Icon(
-                Icons.settings_outlined,
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const SettingsPage(),
-                      fullscreenDialog: true,
-                    ));
-              }),
-        ],
-      ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 600),
-        child: loading
-            ? const Center(child: SizedBox.shrink())
-            : ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                    ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: repositoriesList.length,
-                      itemBuilder: (context, index) {
-                        return RepositoryTile(
-                            key: UniqueKey(),
-                          refreshList: getAllSavedRepositories,
-                            repository: Repository(
-                                id: repositoriesList[index]['id'],
-                                name: repositoriesList[index]['name'],
-                                link: repositoriesList[index]['link'],
-                                idGit: int.parse(repositoriesList[index]['idGit']),
-                                owner: repositoriesList[index]['owner'],
-                                lastUpdate: repositoriesList[index]
-                                    ['lastUpdate'],
-                                createdDate: repositoriesList[index]
-                                    ['createdDate'],
-                              releaseLink: repositoriesList[index]
-                              ['releaseLink'],
-                              releaseVersion: repositoriesList[index]
-                              ['releaseVersion'],
-                              releasePublishedDate: repositoriesList[index]
-                              ['releasePublishedDate'],
-                            ),
-                        );
-                      },
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(title: const Text('Git Repo Watcher'),
+              pinned: false,
+              floating: true,
+              snap: true,
+              actions: [
+                IconButton(
+                    icon: const Icon(
+                      Icons.add_outlined,
                     ),
-                    const SizedBox(
-                      height: 50,
-                    )
-                  ]),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => NewRepository(refreshList: getAllSavedRepositories,),
+                            fullscreenDialog: true,
+                          ));
+                    }),
+                const SizedBox(
+                  width: 10,
+                ),
+                IconButton(
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => const SettingsPage(),
+                            fullscreenDialog: true,
+                          ));
+                    }),
+              ],
+            ),
+          ];
+        },
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 600),
+          child: loading
+              ? const Center(child: SizedBox.shrink())
+              : ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                      ListView.separated(
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: repositoriesList.length,
+                        itemBuilder: (context, index) {
+                          return RepositoryTile(
+                              key: UniqueKey(),
+                            refreshList: getAllSavedRepositories,
+                              repository: Repository(
+                                  id: repositoriesList[index]['id'],
+                                  name: repositoriesList[index]['name'],
+                                  link: repositoriesList[index]['link'],
+                                  idGit: int.parse(repositoriesList[index]['idGit']),
+                                  owner: repositoriesList[index]['owner'],
+                                  lastUpdate: repositoriesList[index]
+                                      ['lastUpdate'],
+                                  createdDate: repositoriesList[index]
+                                      ['createdDate'],
+                                releaseLink: repositoriesList[index]
+                                ['releaseLink'],
+                                releaseVersion: repositoriesList[index]
+                                ['releaseVersion'],
+                                releasePublishedDate: repositoriesList[index]
+                                ['releasePublishedDate'],
+                              ),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 50,
+                      )
+                    ]),
+        ),
       ),
     );
   }

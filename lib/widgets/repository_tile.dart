@@ -7,6 +7,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../classes/release.dart';
 import '../db/repository_dao.dart';
+import '../util/utils_functions.dart';
 
 class RepositoryTile extends StatefulWidget {
   Repository repository;
@@ -28,6 +29,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   bool newVersion = false;
   String savedLink = '';
   String oldDate = '';
+  final TextStyle _styleLatestText = const TextStyle(fontSize: 14);
 
   @override
   void initState() {
@@ -223,43 +225,107 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness _tagTextBrightness = Theme.of(context).brightness;
+
     return InkWell(
       onTap: openBottomMenu,
       onLongPress: getRepositoryData,
       child: Column(
         children: [
-          ListTile(
-            leading: const Icon(Icons.folder_shared_outlined),
-            title: Text(
-              _repo.name!,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w700),
-            ),
-            subtitle: Text(_repo.owner!),
-            trailing: Visibility(
-                visible: newVersion,
-                child: Icon(
-                  Icons.new_releases_outlined,
-                  color: Theme.of(context).colorScheme.primary,
-                )),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: ListTile(
+                  leading: const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
+                    child: Icon(Icons.folder_shared_outlined),
+                  ),
+                  title: Text(
+                    _repo.name!,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(_repo.owner!),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: ListTile(
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Visibility(
+                          visible: newVersion,
+                          child: const Icon(
+                            Icons.new_releases_outlined,
+                            color: Colors.green,
+                          )),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Visibility(
+                        visible: _repo.releasePublishedDate != 'null',
+                        child: Chip(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          label: Text(_repo.releaseVersion!),
+                          labelStyle: TextStyle(
+                              fontSize: 12,
+                              color: _tagTextBrightness == Brightness.dark
+                                  ? lightenColor(
+                                      Theme.of(context).colorScheme.primary, 40)
+                                  : darkenColor(
+                                      Theme.of(context).colorScheme.primary,
+                                      50),
+                              fontWeight: FontWeight.w600),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
           ),
-          ListTile(
-              title: const Text("Latest update"),
-              trailing:
-                  Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"))),
-          Visibility(
-            visible: _repo.releasePublishedDate != 'null',
-            child: ListTile(
-              title: const Text("Latest release "),
-              subtitle: Text(_repo.releaseVersion!),
-              trailing: _repo.releasePublishedDate == 'null'
-                  ? const Text('No releases')
-                  : Text(Jiffy(_repo.releasePublishedDate!)
-                      .format("dd/MM/yyyy")),
-              //trailing: Text(repo.lastUpdate!),
-            ),
-          ),
+          _repo.releasePublishedDate != 'null'
+              ? Row(            
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: ListTile(
+                        subtitle:
+                            Text(
+                              Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                              style: _styleLatestText,
+                            ),
+                        title: Text("Latest update",
+                          style: _styleLatestText,
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                        subtitle: _repo.releasePublishedDate == 'null'
+                            ? Text('No releases',style: _styleLatestText,)
+                            : Text(Jiffy(_repo.releasePublishedDate!)
+                                .format("dd/MM/yyyy"),style: _styleLatestText,),
+                        title: Text("Latest release ",style: _styleLatestText,),
+                      ),
+                    ),
+                  ],
+                )
+              : ListTile(
+                  title: Text("Latest update",style: _styleLatestText,),
+                  trailing: Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),style: _styleLatestText,),
+                ),
         ],
       ),
     );

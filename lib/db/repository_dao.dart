@@ -66,6 +66,11 @@ class RepositoryDao {
     return await db.rawQuery('SELECT * FROM $table ORDER BY id DESC');
   }
 
+  Future<List<Map<String, dynamic>>> queryAllRowsByName() async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnName');
+  }
+
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
     int id = row[columnId];
@@ -77,9 +82,3 @@ class RepositoryDao {
     return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
   }
 }
-
-/*
-  Future<List<Map<String, dynamic>>> queryAllRowsByName() async {
-    Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnName');
-  }*/
