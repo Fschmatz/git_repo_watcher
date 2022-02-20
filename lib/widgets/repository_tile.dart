@@ -294,17 +294,17 @@ class _RepositoryTileState extends State<RepositoryTile> {
             ],
           ),
           _repo.releasePublishedDate != 'null'
-              ? Row(            
+              ? Row(
                   children: [
                     Expanded(
                       flex: 2,
                       child: ListTile(
-                        subtitle:
-                            Text(
-                              Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                              style: _styleLatestText,
-                            ),
-                        title: Text("Latest update",
+                        subtitle: Text(
+                          Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                          style: _styleLatestText,
+                        ),
+                        title: Text(
+                          "Latest update",
                           style: _styleLatestText,
                         ),
                       ),
@@ -312,19 +312,37 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     Flexible(
                       flex: 1,
                       child: ListTile(
-                        contentPadding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
                         subtitle: _repo.releasePublishedDate == 'null'
-                            ? Text('No releases',style: _styleLatestText,)
-                            : Text(Jiffy(_repo.releasePublishedDate!)
-                                .format("dd/MM/yyyy"),style: _styleLatestText,),
-                        title: Text("Latest release ",style: _styleLatestText,),
+                            ? Text(
+                                'No releases',
+                                style: _styleLatestText,
+                                textAlign: TextAlign.end,
+                              )
+                            : Text(
+                                Jiffy(_repo.releasePublishedDate!)
+                                    .format("dd/MM/yyyy"),
+                                style: _styleLatestText,
+                                textAlign: TextAlign.end,
+                              ),
+                        title: Text(
+                          "Latest release ",
+                          style: _styleLatestText,
+                          textAlign: TextAlign.end,
+                        ),
                       ),
                     ),
                   ],
                 )
               : ListTile(
-                  title: Text("Latest update",style: _styleLatestText,),
-                  trailing: Text(Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),style: _styleLatestText,),
+                  title: Text(
+                    "Latest update",
+                    style: _styleLatestText,
+                  ),
+                  trailing: Text(
+                    Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                    style: _styleLatestText,
+                    textAlign: TextAlign.end,
+                  ),
                 ),
         ],
       ),
