@@ -40,6 +40,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   Future<void> getRepositoryData() async {
+    setState(() {
+      loadingData = true;
+    });
+
     //REPO
     final responseRepo = await http.get(Uri.parse(
         "https://api.github.com/repos/" +
@@ -63,7 +67,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
       _repo.releasePublishedDate = _release.publishedDate;
       _repo.id = widget.repository.id;
 
-      checkUpdate();
       _update();
 
       if (mounted) {
@@ -71,6 +74,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
           loadingData = false;
           _repo;
         });
+        showNewReleaseIcon();
       }
     } else if (responseRepo.statusCode == 403) {
       Fluttertoast.showToast(
@@ -96,6 +100,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
     final repositories = RepositoryDao.instance;
     Map<String, dynamic> row = {
       RepositoryDao.columnId: _repo.id,
+      RepositoryDao.columnName: _repo.name,
+      RepositoryDao.columnLink: _repo.link,
+      RepositoryDao.columnIdGit: _repo.idGit,
+      RepositoryDao.columnOwner: _repo.owner,
+      RepositoryDao.columnCreatedDate: _repo.createdDate,
+      RepositoryDao.columnLastUpdate: _repo.lastUpdate,
       RepositoryDao.columnReleaseLink: _repo.releaseLink,
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
       RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
@@ -108,7 +118,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
     final deleted = await repositories.delete(_repo.id!);
   }
 
-  void checkUpdate() {
+  void showNewReleaseIcon() {
     if (oldDate != _repo.releasePublishedDate) {
       setState(() {
         newVersion = !newVersion;
@@ -170,6 +180,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
+                      Navigator.of(context).pop();
                       showAlertDialogOkDelete(context);
                     },
                   ),
@@ -229,10 +240,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
               Expanded(
                 flex: 2,
                 child: ListTile(
-                  leading: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
-                    child: Icon(Icons.folder_shared_outlined),
-                  ),
                   title: Text(
                     _repo.name!,
                     style: TextStyle(
@@ -248,14 +255,19 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Visibility(
-                          visible: newVersion,
-                          child: const Icon(
-                            Icons.new_releases_outlined,
-                            color: Colors.green,
-                          )),
+                      loadingData ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3.0,
+                        ),
+                      ) : const SizedBox.shrink(),
+                      newVersion ? const Icon(
+                        Icons.new_releases_outlined,
+                        color: Colors.green,
+                      ) : const SizedBox.shrink(),
                       const SizedBox(
-                        width: 20,
+                        width: 15,
                       ),
                       Visibility(
                         visible: _repo.releasePublishedDate != 'null',

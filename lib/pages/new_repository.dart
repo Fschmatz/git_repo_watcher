@@ -67,7 +67,6 @@ class _NewRepositoryState extends State<NewRepository> {
       RepositoryDao.columnOwner: _repo.owner,
       RepositoryDao.columnCreatedDate: _repo.createdDate,
       RepositoryDao.columnLastUpdate: _repo.lastUpdate,
-
       RepositoryDao.columnReleaseLink: _repo.releaseLink,
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
       RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,

@@ -66,9 +66,9 @@ ThemeData dark = ThemeData(
     primaryColor: const Color(0xFF1C2127),
     scaffoldBackgroundColor: const Color(0xFF1C2127),
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF54C4B3),//0xFF54C4B3
+      primary: Color(0xFF6FC7B9),
       onSecondary: Color(0xFF22B0D4),
-      secondary: Color(0xFF54C4B3),
+      secondary: Color(0xFF6FC7B9),
     ),
     appBarTheme: const AppBarTheme(
         color: Color(0xFF1C2127),
@@ -87,11 +87,11 @@ ThemeData dark = ThemeData(
       backgroundColor: Color(0xFF1C2127),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        focusColor: const Color(0xFF54C4B3),
+        focusColor: const Color(0xFF6FC7B9),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
-            color: Color(0xFF54C4B3),
+            color: Color(0xFF6FC7B9),
           ),
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -106,8 +106,8 @@ ThemeData dark = ThemeData(
             ),
             borderRadius: BorderRadius.circular(10.0))),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme: IconThemeData(color: Color(0xFF54C4B3)),
-      selectedLabelStyle: TextStyle(color: Color(0xFF54C4B3)),
+      selectedIconTheme: IconThemeData(color: Color(0xFF6FC7B9)),
+      selectedLabelStyle: TextStyle(color: Color(0xFF6FC7B9)),
       showSelectedLabels: false,
       showUnselectedLabels: false,
       backgroundColor: Color(0xFF1C2127),
