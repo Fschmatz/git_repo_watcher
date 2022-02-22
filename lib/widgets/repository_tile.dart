@@ -198,7 +198,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
       ),
       onPressed: () {
         Navigator.of(context).pop();
-        Navigator.of(context).pop();
         _delete();
         widget.refreshList();
       },
