@@ -14,8 +14,8 @@ ThemeData light = ThemeData(
         elevation: 0,
         iconTheme: IconThemeData(color: Color(0xFF000000)),
         titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
             color: Color(0xFF000000))),
     scaffoldBackgroundColor: const Color(0xFFFCFDFF),
     cardTheme: const CardTheme(
@@ -66,16 +66,16 @@ ThemeData dark = ThemeData(
     primaryColor: const Color(0xFF1C2127),
     scaffoldBackgroundColor: const Color(0xFF1C2127),
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFA2FFE9),
+      primary: Color(0xFF8FF5DD),
       onSecondary: Color(0xFF22B0D4),
-      secondary: Color(0xFFA2FFE9),
+      secondary: Color(0xFF8FF5DD),
     ),
     appBarTheme: const AppBarTheme(
         color: Color(0xFF1C2127),
         elevation: 0,
         titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
             color: Color(0xFFFFFFFF))),
     cardTheme: const CardTheme(
       color: Color(0xFF1C2127),
@@ -87,11 +87,11 @@ ThemeData dark = ThemeData(
       backgroundColor: Color(0xFF1C2127),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        focusColor: const Color(0xFFA2FFE9),
+        focusColor: const Color(0xFF8FF5DD),
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
-            color: Color(0xFFA2FFE9),
+            color: Color(0xFF8FF5DD),
           ),
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -106,8 +106,8 @@ ThemeData dark = ThemeData(
             ),
             borderRadius: BorderRadius.circular(10.0))),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme: IconThemeData(color: Color(0xFFA2FFE9)),
-      selectedLabelStyle: TextStyle(color: Color(0xFFA2FFE9)),
+      selectedIconTheme: IconThemeData(color: Color(0xFF8FF5DD)),
+      selectedLabelStyle: TextStyle(color: Color(0xFF8FF5DD)),
       showSelectedLabels: false,
       showUnselectedLabels: false,
       backgroundColor: Color(0xFF1C2127),
