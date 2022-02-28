@@ -254,42 +254,53 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      loadingData ? const SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3.0,
-                        ),
-                      ) : const SizedBox.shrink(),
-                      newVersion ? const Icon(
-                        Icons.new_releases_outlined,
-                        color: Colors.green,
-                      ) : const SizedBox.shrink(),
+                      newVersion
+                          ? const Icon(
+                              Icons.new_releases_outlined,
+                              color: Colors.green,
+                            )
+                          : const SizedBox.shrink(),
                       const SizedBox(
                         width: 15,
                       ),
-                      Visibility(
-                        visible: _repo.releasePublishedDate != 'null',
-                        child: Chip(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          label: Text(_repo.releaseVersion!),
-                          labelStyle: TextStyle(
-                              fontSize: 12,
-                              color: _tagTextBrightness == Brightness.dark
-                                  ? lightenColor(
-                                      Theme.of(context).colorScheme.onSecondary, 40)
-                                  : darkenColor(
-                                      Theme.of(context).colorScheme.onSecondary,
-                                      50),
-                              fontWeight: FontWeight.w600),
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .onSecondary
-                              .withOpacity(0.3),
-                        ),
-                      ),
+                      loadingData
+                          ? const Padding(
+                            padding:  EdgeInsets.only(right: 25.0),
+                            child: SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                ),
+                              ),
+                          )
+                          : Visibility(
+                              visible: _repo.releasePublishedDate != 'null',
+                              child: Chip(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                label: Text(_repo.releaseVersion!),
+                                labelStyle: TextStyle(
+                                    fontSize: 12,
+                                    color: _tagTextBrightness == Brightness.dark
+                                        ? lightenColor(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                            40)
+                                        : darkenColor(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                            50),
+                                    fontWeight: FontWeight.w600),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .onSecondary
+                                    .withOpacity(0.3),
+                              ),
+                            ),
                     ],
                   ),
                 ),
