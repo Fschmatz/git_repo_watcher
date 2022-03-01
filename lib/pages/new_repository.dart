@@ -141,9 +141,6 @@ class _NewRepositoryState extends State<NewRepository> {
                 counterText: "",
                 helperText: "* Required",
               ),
-              style: const TextStyle(
-                fontSize: 16,
-              ),
             ),
           ),
         ],

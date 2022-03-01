@@ -7,6 +7,7 @@ class Changelog{
 1.1.1  
 - Bug Fixes
 - UI Changes
+- Add Commits Page link
 - Loading Indicator
 ''';
 

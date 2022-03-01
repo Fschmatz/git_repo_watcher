@@ -156,6 +156,18 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     },
                   ),
                   const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.open_in_new_outlined),
+                    title: const Text(
+                      "View commits",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _launchPage(widget.repository.link!+"/commits/master"!);
+                    },
+                  ),
+                  const Divider(),
                   Visibility(
                     visible: _repo.releasePublishedDate! != 'null',
                     child: ListTile(
@@ -265,12 +277,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       ),
                       loadingData
                           ? const Padding(
-                            padding:  EdgeInsets.only(right: 25.0),
+                            padding:  EdgeInsets.only(right: 20.0),
                             child: SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
+                                  strokeWidth: 2.0,
                                 ),
                               ),
                           )
