@@ -1,10 +1,10 @@
 class Changelog{
 
-  static String appVersion = "1.1.1";
+  static String appVersion = "1.1.2";
   static String appName = "Git Repo Watcher Fschmatz";
 
   static String changelogCurrent = ''' 
-1.1.1  
+1.1.2  
 - Bug Fixes
 - UI Changes
 - Add Commits Page link

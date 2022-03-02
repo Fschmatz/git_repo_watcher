@@ -65,7 +65,7 @@ class _NewRepositoryState extends State<NewRepository> {
       RepositoryDao.columnLink: customControllerRepoLink.text,
       RepositoryDao.columnIdGit: _repo.idGit,
       RepositoryDao.columnOwner: _repo.owner,
-      RepositoryDao.columnCreatedDate: _repo.createdDate,
+      RepositoryDao.columnDefaultBranch: _repo.defaultBranch,
       RepositoryDao.columnLastUpdate: _repo.lastUpdate,
       RepositoryDao.columnReleaseLink: _repo.releaseLink,
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,

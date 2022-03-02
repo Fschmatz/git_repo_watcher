@@ -98,8 +98,8 @@ class _HomeState extends State<Home> {
                                   owner: repositoriesList[index]['owner'],
                                   lastUpdate: repositoriesList[index]
                                       ['lastUpdate'],
-                                  createdDate: repositoriesList[index]
-                                      ['createdDate'],
+                                defaultBranch: repositoriesList[index]
+                                      ['defaultBranch'],
                                 releaseLink: repositoriesList[index]
                                 ['releaseLink'],
                                 releaseVersion: repositoriesList[index]

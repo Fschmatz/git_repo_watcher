@@ -104,7 +104,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
       RepositoryDao.columnLink: _repo.link,
       RepositoryDao.columnIdGit: _repo.idGit,
       RepositoryDao.columnOwner: _repo.owner,
-      RepositoryDao.columnCreatedDate: _repo.createdDate,
+      RepositoryDao.columnDefaultBranch: _repo.defaultBranch,
       RepositoryDao.columnLastUpdate: _repo.lastUpdate,
       RepositoryDao.columnReleaseLink: _repo.releaseLink,
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
@@ -159,12 +159,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   ListTile(
                     leading: const Icon(Icons.open_in_new_outlined),
                     title: const Text(
-                      "View commits",
+                      "View default branch commits",
                       style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
-                      _launchPage(widget.repository.link!+"/commits/master"!);
+                      _launchPage(widget.repository.link!+"/commits/"+widget.repository.defaultBranch!);
                     },
                   ),
                   const Divider(),
@@ -255,7 +255,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     _repo.name!,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w700),
+                        fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(_repo.owner!),
                 ),
@@ -310,7 +310,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .onSecondary
-                                    .withOpacity(0.3),
+                                    .withOpacity(0.4),
                               ),
                             ),
                     ],

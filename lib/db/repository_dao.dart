@@ -14,7 +14,7 @@ class RepositoryDao {
   static const columnIdGit = 'idGit';
   static const columnOwner = 'owner';
   static const columnLastUpdate = 'lastUpdate';
-  static const columnCreatedDate = 'createdDate';
+  static const columnDefaultBranch = 'defaultBranch';
   static const columnReleaseLink = 'releaseLink';
   static const columnReleaseVersion = 'releaseVersion';
   static const columnReleasePublishedDate = 'releasePublishedDate';
@@ -43,7 +43,7 @@ class RepositoryDao {
            $columnIdGit TEXT NOT NULL,  
            $columnOwner TEXT NOT NULL,  
            $columnLastUpdate ,  
-           $columnCreatedDate ,
+           $columnDefaultBranch ,
            $columnReleaseLink ,  
            $columnReleaseVersion ,  
            $columnReleasePublishedDate                      
@@ -68,7 +68,8 @@ class RepositoryDao {
 
   Future<List<Map<String, dynamic>>> queryAllRowsByName() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnName COLLATE NOCASE');
+    return await db
+        .rawQuery('SELECT * FROM $table ORDER BY $columnName COLLATE NOCASE');
   }
 
   Future<int> update(Map<String, dynamic> row) async {
