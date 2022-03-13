@@ -26,6 +26,9 @@ ThemeData light = ThemeData(
     ),
     dialogTheme: const DialogTheme(
       backgroundColor: Color(0xFFFCFDFF),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
         focusColor:  const Color(0xFF00B591),
@@ -78,6 +81,9 @@ ThemeData dark = ThemeData(
     ),
     dialogTheme: const DialogTheme(
       backgroundColor: Color(0xFF1C2127),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
         focusColor: const Color(0xFF73E3A6),

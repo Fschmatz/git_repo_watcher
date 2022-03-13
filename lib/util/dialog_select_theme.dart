@@ -21,18 +21,14 @@ class _DialogSelectThemeState extends State<DialogSelectTheme> {
     Color appAccent = Theme.of(context).colorScheme.primary;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      contentPadding: const EdgeInsets.all(0),
-      titlePadding: const EdgeInsets.fromLTRB(16, 25, 0, 24),
       title: const Text('Select Theme'),
       content: SizedBox(
-          height: 180.0,
           width: 350.0,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                 activeColor: appAccent,
                 key: UniqueKey(),
                 value: 0,
@@ -43,6 +39,7 @@ class _DialogSelectThemeState extends State<DialogSelectTheme> {
                 },
               ),
               RadioListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                 activeColor: appAccent,
                 key: UniqueKey(),
                 value: 1,
@@ -53,6 +50,7 @@ class _DialogSelectThemeState extends State<DialogSelectTheme> {
                 },
               ),
               RadioListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                 activeColor: appAccent,
                 key: UniqueKey(),
                 value: 2,

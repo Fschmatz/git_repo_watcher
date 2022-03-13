@@ -87,28 +87,25 @@ class _NewRepositoryState extends State<NewRepository> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-            child: IconButton(
-              tooltip: 'Save',
-              icon: const Icon(
-                Icons.save_outlined,
-              ),
-              onPressed: () async {
-                String errors = checkForErrors();
-                if (errors.isEmpty) {
-                  getRepositoryDataAndSave();
-                  Navigator.of(context).pop();
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return dialogAlertErrors(errors, context);
-                    },
-                  );
-                }
-              },
+          IconButton(
+            tooltip: 'Save',
+            icon: const Icon(
+              Icons.save_outlined,
             ),
+            onPressed: () async {
+              String errors = checkForErrors();
+              if (errors.isEmpty) {
+                getRepositoryDataAndSave();
+                Navigator.of(context).pop();
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return dialogAlertErrors(errors, context);
+                  },
+                );
+              }
+            },
           )
         ],
         title: const Text('New Repository'),
@@ -116,19 +113,13 @@ class _NewRepositoryState extends State<NewRepository> {
       body: ListView(
         children: [
           ListTile(
-            leading: const SizedBox(
-              height: 0.1,
-            ),
-            title: Text("Repository Link".toUpperCase(),
+            title: Text("Repository Link",
                 style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.secondary)),
           ),
           ListTile(
-            leading: const Icon(
-              Icons.notes_outlined,
-            ),
             title: TextField(
               autofocus: true,
               minLines: 1,
@@ -140,6 +131,9 @@ class _NewRepositoryState extends State<NewRepository> {
                 border: InputBorder.none,
                 counterText: "",
                 helperText: "* Required",
+                prefixIcon: Icon(
+                  Icons.notes_outlined,
+                ),
               ),
             ),
           ),

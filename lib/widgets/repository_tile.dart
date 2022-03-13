@@ -204,35 +204,30 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   showAlertDialogOkDelete(BuildContext context) {
-    Widget okButton = TextButton(
-      child: const Text(
-        "Yes",
-      ),
-      onPressed: () {
-        Navigator.of(context).pop();
-        _delete();
-        widget.refreshList();
-      },
-    );
 
-    AlertDialog alert = AlertDialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      title: const Text(
-        "Confirm",
-      ),
-      content: const Text(
-        "Delete ?",
-      ),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return AlertDialog(
+          title: const Text(
+            "Confirm",
+          ),
+          content: const Text(
+            "Delete ?",
+          ),
+          actions: [
+            TextButton(
+              child: const Text(
+                "Yes",
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _delete();
+                widget.refreshList();
+              },
+            )
+          ],
+        );
       },
     );
   }

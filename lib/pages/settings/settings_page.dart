@@ -1,6 +1,6 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/material.dart';
-import '../../util/changelog.dart';
+import '../../util/app_details.dart';
 import '../../util/dialog_select_theme.dart';
 import 'app_info_page.dart';
 import 'changelog_page.dart';
@@ -22,7 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (theme == 'system') {
       theme = 'system default';
     }
-    return theme.replaceFirst(theme[0], theme[0].toUpperCase());
+    return theme.replaceFirst(theme[0], theme[0]);
   }
 
   @override
@@ -44,20 +44,19 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               child: ListTile(
                 title: Text(
-                  Changelog.appName + " " + Changelog.appVersion,
+                  AppDetails.appName + " " + AppDetails.appVersion,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 17.5,color: Colors.black87),
                 ),
               ),
-            ),
-            const Divider(),
+            ),           
             ListTile(
-              leading: const SizedBox(height: 0.1,),
+             
               title:    Text(
-                  "General".toUpperCase(),
+                  "General",
                   style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: themeColorApp)
               ),
             ),
@@ -76,14 +75,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 getThemeStringFormatted(),
               ),
             ),
-            const Divider(),
+
             ListTile(
-              leading: const SizedBox(height: 0.1,),
+
               title: Text(
-                  "About".toUpperCase(),
+                  "About",
                   style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: themeColorApp)
               ),
             ),
@@ -121,14 +120,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     ));
               },
             ),
-            const Divider(),
+
             ListTile(
-              leading: const SizedBox(height: 0.1,),
+
               title: Text(
-                  "Alert".toUpperCase(),
+                  "Alert",
                   style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: themeColorApp)
               ),
             ),

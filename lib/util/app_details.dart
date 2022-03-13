@@ -1,7 +1,8 @@
-class Changelog{
+class AppDetails{
 
   static String appVersion = "1.1.2";
   static String appName = "Git Repo Watcher Fschmatz";
+  static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
 
   static String changelogCurrent = ''' 
 1.1.2  
