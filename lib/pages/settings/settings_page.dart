@@ -13,7 +13,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   String getThemeStringFormatted() {
     String theme = EasyDynamicTheme.of(context)
         .themeMode
@@ -27,8 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    Color? themeColorApp =Theme.of(context).colorScheme.primary;
+    Color? themeColorApp = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
         appBar: AppBar(
@@ -39,26 +37,23 @@ class _SettingsPageState extends State<SettingsPage> {
             Card(
               margin: const EdgeInsets.fromLTRB(16, 20, 16, 25),
               color: themeColorApp,
-              shape: const  RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
               child: ListTile(
                 title: Text(
                   AppDetails.appName + " " + AppDetails.appVersion,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 17.5,color: Colors.black87),
+                  style: const TextStyle(fontSize: 17.5, color: Colors.black87),
                 ),
               ),
-            ),           
+            ),
             ListTile(
-             
-              title:    Text(
-                  "General",
+              title: Text("General",
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: themeColorApp)
-              ),
+                      color: themeColorApp)),
             ),
             ListTile(
               onTap: () => showDialog(
@@ -75,16 +70,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 getThemeStringFormatted(),
               ),
             ),
-
             ListTile(
-
-              title: Text(
-                  "About",
+              title: Text("About",
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: themeColorApp)
-              ),
+                      color: themeColorApp)),
             ),
             ListTile(
               leading: const Icon(
@@ -120,19 +111,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     ));
               },
             ),
-
             ListTile(
-
-              title: Text(
-                  "Alert",
+              title: Text("Alert",
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: themeColorApp)
-              ),
+                      color: themeColorApp)),
             ),
             const ListTile(
-              leading:  Icon(
+              leading: Icon(
                 Icons.report_problem_outlined,
               ),
               title: Text(
