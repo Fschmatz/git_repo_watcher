@@ -12,9 +12,12 @@ import '../util/utils_functions.dart';
 class RepositoryTile extends StatefulWidget {
   Repository repository;
   Function refreshList;
+  bool checkUpdatesAll;
 
   RepositoryTile(
-      {Key? key, required this.repository, required this.refreshList})
+      {Key? key, required this.repository,
+        required this.refreshList,
+        required this.checkUpdatesAll})
       : super(key: key);
 
   @override
@@ -33,10 +36,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   void initState() {
-    super.initState();
     formattedRepositoryData = widget.repository.link!.split('/');
     _repo = widget.repository;
     oldDate = widget.repository.releasePublishedDate!;
+    if(widget.checkUpdatesAll){
+      getRepositoryData();
+    }
+    super.initState();
   }
 
   Future<void> getRepositoryData() async {
@@ -240,7 +246,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: InkWell(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         onTap: openBottomMenu,
         onLongPress: getRepositoryData,
         child: Column(

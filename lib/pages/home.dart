@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<Map<String, dynamic>> repositoriesList = [];
   bool loading = true;
+  bool checkUpdatesAll = false;
 
   @override
   void initState() {
@@ -31,13 +32,20 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Future<void> refreshAllAndCheckUpdates() async {
+    setState(() {
+      checkUpdatesAll = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            SliverAppBar(title: const Text('Git Repo Watcher'),
+            SliverAppBar(
+              title: const Text('Git Repo Watcher'),
               pinned: false,
               floating: true,
               snap: true,
@@ -50,7 +58,9 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (BuildContext context) => NewRepository(refreshList: getAllSavedRepositories,),
+                            builder: (BuildContext context) => NewRepository(
+                              refreshList: getAllSavedRepositories,
+                            ),
                             fullscreenDialog: true,
                           ));
                     }),
@@ -65,7 +75,8 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (BuildContext context) => const SettingsPage(),
+                            builder: (BuildContext context) =>
+                                const SettingsPage(),
                             fullscreenDialog: true,
                           ));
                     }),
@@ -77,43 +88,51 @@ class _HomeState extends State<Home> {
           duration: const Duration(milliseconds: 600),
           child: loading
               ? const Center(child: SizedBox.shrink())
-              : ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                      ListView.separated(
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const SizedBox(height: 16,),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: repositoriesList.length,
-                        itemBuilder: (context, index) {
-                          return RepositoryTile(
+              : RefreshIndicator(
+                  onRefresh: refreshAllAndCheckUpdates,
+                  color: Theme.of(context).colorScheme.primary,
+                  child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        ListView.separated(
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const SizedBox(
+                            height: 16,
+                          ),
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: repositoriesList.length,
+                          itemBuilder: (context, index) {
+                            return RepositoryTile(
                               key: UniqueKey(),
-                            refreshList: getAllSavedRepositories,
+                              refreshList: getAllSavedRepositories,
+                              checkUpdatesAll: checkUpdatesAll,
                               repository: Repository(
-                                  id: repositoriesList[index]['id'],
-                                  name: repositoriesList[index]['name'],
-                                  link: repositoriesList[index]['link'],
-                                  idGit: int.parse(repositoriesList[index]['idGit']),
-                                  owner: repositoriesList[index]['owner'],
-                                  lastUpdate: repositoriesList[index]
-                                      ['lastUpdate'],
+                                id: repositoriesList[index]['id'],
+                                name: repositoriesList[index]['name'],
+                                link: repositoriesList[index]['link'],
+                                idGit:
+                                    int.parse(repositoriesList[index]['idGit']),
+                                owner: repositoriesList[index]['owner'],
+                                lastUpdate: repositoriesList[index]
+                                    ['lastUpdate'],
                                 defaultBranch: repositoriesList[index]
-                                      ['defaultBranch'],
+                                    ['defaultBranch'],
                                 releaseLink: repositoriesList[index]
-                                ['releaseLink'],
+                                    ['releaseLink'],
                                 releaseVersion: repositoriesList[index]
-                                ['releaseVersion'],
+                                    ['releaseVersion'],
                                 releasePublishedDate: repositoriesList[index]
-                                ['releasePublishedDate'],
+                                    ['releasePublishedDate'],
                               ),
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 50,
-                      )
-                    ]),
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 50,
+                        )
+                      ]),
+                ),
         ),
       ),
     );

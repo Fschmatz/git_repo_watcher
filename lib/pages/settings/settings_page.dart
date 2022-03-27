@@ -64,7 +64,6 @@ class _SettingsPageState extends State<SettingsPage> {
               leading: const Icon(Icons.brightness_6_outlined),
               title: const Text(
                 "App Theme",
-                style: TextStyle(fontSize: 16),
               ),
               subtitle: Text(
                 getThemeStringFormatted(),
@@ -83,7 +82,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               title: const Text(
                 "App Info",
-                style: TextStyle(fontSize: 16),
               ),
               onTap: () {
                 Navigator.push(
@@ -100,7 +98,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               title: const Text(
                 "Changelog",
-                style: TextStyle(fontSize: 16),
               ),
               onTap: () {
                 Navigator.push(
@@ -123,8 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Icons.report_problem_outlined,
               ),
               title: Text(
-                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item).",
-                style: TextStyle(fontSize: 16),
+                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item or swipe down to refresh all items).",
               ),
             ),
           ],
