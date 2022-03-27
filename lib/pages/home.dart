@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
                   children: [
                       ListView.separated(
                         separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(),
+                            const SizedBox(height: 16,),
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: repositoriesList.length,

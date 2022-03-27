@@ -21,7 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (theme == 'system') {
       theme = 'system default';
     }
-    return theme.replaceFirst(theme[0], theme[0]);
+    return theme.replaceFirst(theme[0], theme[0].toUpperCase());
   }
 
   @override

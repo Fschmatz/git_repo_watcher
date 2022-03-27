@@ -164,7 +164,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
-                      _launchPage(widget.repository.link!+"/commits/"+widget.repository.defaultBranch!);
+                      _launchPage(widget.repository.link! +
+                          "/commits/" +
+                          widget.repository.defaultBranch!);
                     },
                   ),
                   const Divider(),
@@ -204,7 +206,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   showAlertDialogOkDelete(BuildContext context) {
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -236,136 +237,141 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Widget build(BuildContext context) {
     final Brightness _tagTextBrightness = Theme.of(context).brightness;
 
-    return InkWell(
-      onTap: openBottomMenu,
-      onLongPress: getRepositoryData,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: ListTile(
-                  title: Text(
-                    _repo.name!,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(_repo.owner!),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: ListTile(
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      newVersion
-                          ? const Icon(
-                              Icons.new_releases_outlined,
-                              color: Colors.green,
-                            )
-                          : const SizedBox.shrink(),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      loadingData
-                          ? const Padding(
-                            padding:  EdgeInsets.only(right: 20.0),
-                            child: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                ),
-                              ),
-                          )
-                          : Visibility(
-                              visible: _repo.releasePublishedDate != 'null',
-                              child: Chip(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                label: Text(_repo.releaseVersion!),
-                                labelStyle: TextStyle(
-                                    fontSize: 12,
-                                    color: _tagTextBrightness == Brightness.dark
-                                        ? lightenColor(
-                                            Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary,
-                                            40)
-                                        : darkenColor(
-                                            Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary,
-                                            50),
-                                    fontWeight: FontWeight.w600),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondary
-                                    .withOpacity(0.4),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-          _repo.releasePublishedDate != 'null'
-              ? Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: ListTile(
-                        subtitle: Text(
-                          Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                          style: _styleLatestText,
-                        ),
-                        title: Text(
-                          "Latest update",
-                          style: _styleLatestText,
-                        ),
-                      ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: InkWell(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+        onTap: openBottomMenu,
+        onLongPress: getRepositoryData,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: ListTile(
+                    title: Text(
+                      _repo.name!,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600),
                     ),
-                    Flexible(
-                      flex: 1,
-                      child: ListTile(
-                        subtitle: _repo.releasePublishedDate == 'null'
-                            ? Text(
-                                'No releases',
-                                style: _styleLatestText,
-                                textAlign: TextAlign.end,
+                    subtitle: Text(_repo.owner!),
+                  ),
+                ),
+                Flexible(
+                  flex: 2,
+                  child: ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        newVersion
+                            ? const Icon(
+                                Icons.new_releases_outlined,
+                                color: Colors.green,
                               )
-                            : Text(
-                                Jiffy(_repo.releasePublishedDate!)
-                                    .format("dd/MM/yyyy"),
-                                style: _styleLatestText,
-                                textAlign: TextAlign.end,
+                            : const SizedBox.shrink(),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        loadingData
+                            ? const Padding(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                  ),
+                                ),
+                              )
+                            : Visibility(
+                                visible: _repo.releasePublishedDate != 'null',
+                                child: Chip(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  label: Text(_repo.releaseVersion!),
+                                  labelStyle: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          _tagTextBrightness == Brightness.dark
+                                              ? lightenColor(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary,
+                                                  40)
+                                              : darkenColor(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary,
+                                                  50),
+                                      fontWeight: FontWeight.w600),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary
+                                      .withOpacity(0.4),
+                                ),
                               ),
-                        title: Text(
-                          "Latest release ",
-                          style: _styleLatestText,
-                          textAlign: TextAlign.end,
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+            _repo.releasePublishedDate != 'null'
+                ? Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: ListTile(
+                          subtitle: Text(
+                            Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                            style: _styleLatestText,
+                          ),
+                          title: Text(
+                            "Latest update",
+                            style: _styleLatestText,
+                          ),
                         ),
                       ),
+                      Flexible(
+                        flex: 1,
+                        child: ListTile(
+                          subtitle: _repo.releasePublishedDate == 'null'
+                              ? Text(
+                                  'No releases',
+                                  style: _styleLatestText,
+                                  textAlign: TextAlign.end,
+                                )
+                              : Text(
+                                  Jiffy(_repo.releasePublishedDate!)
+                                      .format("dd/MM/yyyy"),
+                                  style: _styleLatestText,
+                                  textAlign: TextAlign.end,
+                                ),
+                          title: Text(
+                            "Latest release ",
+                            style: _styleLatestText,
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : ListTile(
+                    title: Text(
+                      "Latest update",
+                      style: _styleLatestText,
                     ),
-                  ],
-                )
-              : ListTile(
-                  title: Text(
-                    "Latest update",
-                    style: _styleLatestText,
+                    trailing: Text(
+                      Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                      style: _styleLatestText,
+                      textAlign: TextAlign.end,
+                    ),
                   ),
-                  trailing: Text(
-                    Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                    style: _styleLatestText,
-                    textAlign: TextAlign.end,
-                  ),
-                ),
-        ],
+          ],
+        ),
       ),
     );
   }

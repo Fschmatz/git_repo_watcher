@@ -1,18 +1,22 @@
 class AppDetails{
 
-  static String appVersion = "1.1.2";
+  static String appVersion = "1.2.0";
   static String appName = "Git Repo Watcher Fschmatz";
   static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
 
   static String changelogCurrent = ''' 
+1.2.0  
+- Cards
+- Bug Fix
+''';
+
+  static String changelogsOld = '''  
 1.1.2  
 - Bug Fixes
 - UI Changes
 - Add Commits Page link
 - Loading Indicator
-''';
 
-  static String changelogsOld = '''  
 1.0.4
 - Technically Usable
 - New UI
