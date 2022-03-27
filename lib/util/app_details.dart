@@ -7,7 +7,6 @@ class AppDetails{
   static String changelogCurrent = ''' 
 1.2.0  
 - Cards
-- Swipe Down to Refresh All
 - Bug Fix
 ''';
 

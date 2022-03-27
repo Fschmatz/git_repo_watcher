@@ -120,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Icons.report_problem_outlined,
               ),
               title: Text(
-                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item or swipe down to refresh all items).",
+                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item).",
               ),
             ),
           ],
