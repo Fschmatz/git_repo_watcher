@@ -6,7 +6,7 @@ class AppDetails{
 
   static String changelogCurrent = ''' 
 1.2.0  
-- Cards
+- UI Changes
 - Bug Fix
 ''';
 

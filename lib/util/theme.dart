@@ -59,15 +59,15 @@ ThemeData light = ThemeData(
 ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFF161A1F),
-    scaffoldBackgroundColor: const Color(0xFF161A1F),
+    primaryColor: const Color(0xFF1F242A),
+    scaffoldBackgroundColor: const Color(0xFF1F242A),
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFF73E3A6),
       onSecondary: Color(0xFF22B0D4),
       secondary: Color(0xFF73E3A6),
     ),
     appBarTheme: const AppBarTheme(
-        color: Color(0xFF161A1F),
+        color: Color(0xFF1F242A),
         elevation: 0,
         titleTextStyle: TextStyle(
             fontSize: 22,
@@ -80,7 +80,7 @@ ThemeData dark = ThemeData(
       ),
     ),
     dialogTheme: const DialogTheme(
-      backgroundColor: Color(0xFF161A1F),
+      backgroundColor: Color(0xFF1F242A),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(28)),
       ),
@@ -105,8 +105,8 @@ ThemeData dark = ThemeData(
             ),
             borderRadius: BorderRadius.circular(10.0))),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF161A1F),
+      backgroundColor: Color(0xFF1F242A),
     ),
-    bottomAppBarColor: const Color(0xFF161A1F),
+    bottomAppBarColor: const Color(0xFF1F242A),
     bottomSheetTheme:
-    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF161A1F)));
+    const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1F242A)));

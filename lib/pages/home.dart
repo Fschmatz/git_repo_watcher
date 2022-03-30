@@ -85,10 +85,7 @@ class _HomeState extends State<Home> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
                     ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const SizedBox(
-                        height: 16,
-                      ),
+                      separatorBuilder: (BuildContext context, int index) => const Divider(),
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: repositoriesList.length,
