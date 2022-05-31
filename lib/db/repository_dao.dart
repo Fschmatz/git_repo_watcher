@@ -10,6 +10,7 @@ class RepositoryDao {
   static const table = 'repositories';
   static const columnId = 'id';
   static const columnName = 'name';
+  static const columnNote = 'note';
   static const columnLink = 'link';
   static const columnIdGit = 'idGit';
   static const columnOwner = 'owner';
@@ -41,12 +42,13 @@ class RepositoryDao {
            $columnName TEXT NOT NULL, 
            $columnLink TEXT NOT NULL,  
            $columnIdGit TEXT NOT NULL,  
-           $columnOwner TEXT NOT NULL,  
-           $columnLastUpdate ,  
-           $columnDefaultBranch ,
-           $columnReleaseLink ,  
-           $columnReleaseVersion ,  
-           $columnReleasePublishedDate                      
+           $columnOwner TEXT NOT NULL,
+           $columnNote TEXT,   
+           $columnLastUpdate TEXT,  
+           $columnDefaultBranch TEXT,
+           $columnReleaseLink TEXT, 
+           $columnReleaseVersion TEXT,  
+           $columnReleasePublishedDate TEXT                 
           )
           ''');
   }

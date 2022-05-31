@@ -4,6 +4,7 @@ class Repository {
   int? id;
   int? idGit;
   String? name;
+  String? note;
   String? owner;
   String? link;
   String? lastUpdate;
@@ -16,6 +17,7 @@ class Repository {
       {this.id,
       required this.idGit,
       required this.name,
+      this.note,
       required this.link,
       required this.owner,
       required this.lastUpdate,

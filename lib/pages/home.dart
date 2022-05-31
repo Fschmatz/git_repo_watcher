@@ -50,11 +50,10 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       Navigator.push(
                           context,
-                          MaterialPageRoute<void>(
+                          MaterialPageRoute(
                             builder: (BuildContext context) => NewRepository(
                               refreshList: getAllSavedRepositories,
                             ),
-                            fullscreenDialog: true,
                           ));
                     }),
                 const SizedBox(
@@ -67,10 +66,9 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       Navigator.push(
                           context,
-                          MaterialPageRoute<void>(
+                          MaterialPageRoute(
                             builder: (BuildContext context) =>
                                 const SettingsPage(),
-                            fullscreenDialog: true,
                           ));
                     }),
               ],
@@ -96,6 +94,7 @@ class _HomeState extends State<Home> {
                           repository: Repository(
                             id: repositoriesList[index]['id'],
                             name: repositoriesList[index]['name'],
+                            note: repositoriesList[index]['note'],
                             link: repositoriesList[index]['link'],
                             idGit:
                                 int.parse(repositoriesList[index]['idGit']),
