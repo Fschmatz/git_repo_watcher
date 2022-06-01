@@ -238,9 +238,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Widget build(BuildContext context) {
     final Brightness tagTextBrightness = Theme.of(context).brightness;
 
-    final TextStyle styleTrailingText = TextStyle(
+    final TextStyle styleTrailingDataText = TextStyle(
       color: Theme.of(context).hintColor,
-        fontSize: 14,
+        fontSize: 12,
       fontWeight: FontWeight.w400
     );
 
@@ -250,7 +250,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
         fontWeight: FontWeight.w400
     );
 
-    EdgeInsets paddingText = const EdgeInsets.symmetric(horizontal: 16,vertical: 1);
+    EdgeInsets paddingText = const EdgeInsets.symmetric(horizontal: 16,vertical: 2);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
@@ -337,7 +337,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
             (_repo.note!.isEmpty)
                 ? const SizedBox.shrink()
                 : Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                  padding: paddingText,
                   child: Row(
                     children: [
                       Text(
@@ -365,7 +365,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                             ),
                             Text(
                               Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                              style: styleTrailingText,
+                              style: styleTrailingDataText,
                             ),
                           ],
                         ),
@@ -382,12 +382,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
                             _repo.releasePublishedDate == 'null'
                                 ? Text(
                                     'No releases',
-                                    style: styleTrailingText,
+                                    style: styleTrailingDataText,
                                   )
                                 : Text(
                                     Jiffy(_repo.releasePublishedDate!)
                                         .format("dd/MM/yyyy"),
-                                    style: styleTrailingText,
+                                    style: styleTrailingDataText,
                                   ),
                           ],
                         ),
@@ -405,7 +405,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                         ),
                         Text(
                           Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                          style: styleTrailingText,
+                          style: styleTrailingDataText,
                         ),
                       ],
                     ),
