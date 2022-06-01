@@ -240,13 +240,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
     final TextStyle styleTrailingText = TextStyle(
       color: Theme.of(context).hintColor,
-        fontSize: 12,
+        fontSize: 14,
       fontWeight: FontWeight.w400
     );
 
     TextStyle styleTitleText = TextStyle(
         color: Theme.of(context).hintColor,
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: FontWeight.w400
     );
 
@@ -337,7 +337,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
             (_repo.note!.isEmpty)
                 ? const SizedBox.shrink()
                 : Padding(
-                  padding: paddingText,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                   child: Row(
                     children: [
                       Text(
