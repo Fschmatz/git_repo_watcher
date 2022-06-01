@@ -14,8 +14,7 @@ class RepositoryTile extends StatefulWidget {
   Function refreshList;
 
   RepositoryTile(
-      {Key? key, required this.repository,
-        required this.refreshList})
+      {Key? key, required this.repository, required this.refreshList})
       : super(key: key);
 
   @override
@@ -30,7 +29,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   bool newVersion = false;
   String savedLink = '';
   String oldDate = '';
-  final TextStyle _styleLatestText = const TextStyle(fontSize: 14);
+
 
   @override
   void initState() {
@@ -62,13 +61,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
-      Release _release = Release.fromJSON(jsonDecode(responseRelease.body));
-      _repo.releaseLink = _release.link;
-      _repo.releaseVersion = _release.version;
-      _repo.releasePublishedDate = _release.publishedDate;
+      Release release = Release.fromJSON(jsonDecode(responseRelease.body));
+      _repo.releaseLink = release.link;
+      _repo.releaseVersion = release.version;
+      _repo.releasePublishedDate = release.publishedDate;
       _repo.id = widget.repository.id;
+      _repo.note = widget.repository.note;
 
-      _update();
+      await _update();
 
       if (mounted) {
         setState(() {
@@ -97,12 +97,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
     }
   }
 
-  void _update() async {
+  Future<void> _update() async {
     final repositories = RepositoryDao.instance;
     Map<String, dynamic> row = {
       RepositoryDao.columnId: _repo.id,
       RepositoryDao.columnName: _repo.name,
       RepositoryDao.columnLink: _repo.link,
+      RepositoryDao.columnNote: _repo.note,
       RepositoryDao.columnIdGit: _repo.idGit,
       RepositoryDao.columnOwner: _repo.owner,
       RepositoryDao.columnDefaultBranch: _repo.defaultBranch,
@@ -128,14 +129,17 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   _launchPage(String url) {
-    launch(url);
+    launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   void openBottomMenu() {
     showModalBottomSheet(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0)),
+              topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
         ),
         isScrollControlled: true,
         context: context,
@@ -149,7 +153,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     leading: const Icon(Icons.open_in_new_outlined),
                     title: const Text(
                       "View repository",
-                      style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
@@ -161,7 +164,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     leading: const Icon(Icons.open_in_new_outlined),
                     title: const Text(
                       "View default branch commits",
-                      style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
@@ -177,7 +179,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       leading: const Icon(Icons.open_in_new_outlined),
                       title: const Text(
                         "View latest release",
-                        style: TextStyle(fontSize: 16),
                       ),
                       onTap: () {
                         Navigator.of(context).pop();
@@ -192,7 +193,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     leading: const Icon(Icons.delete_outline_outlined),
                     title: const Text(
                       "Delete",
-                      style: TextStyle(fontSize: 16),
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
@@ -236,139 +236,175 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness _tagTextBrightness = Theme.of(context).brightness;
+    final Brightness tagTextBrightness = Theme.of(context).brightness;
 
-    return InkWell(
-      onTap: openBottomMenu,
-      onLongPress: getRepositoryData,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: ListTile(
-                  title: Text(
-                    _repo.name!,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w400),
+    final TextStyle styleTrailingText = TextStyle(
+      color: Theme.of(context).hintColor,
+        fontSize: 14,
+      fontWeight: FontWeight.w400
+    );
+
+    TextStyle styleTitleText = TextStyle(
+        color: Theme.of(context).hintColor,
+        fontSize: 14,
+        fontWeight: FontWeight.w400
+    );
+
+    EdgeInsets paddingText = const EdgeInsets.symmetric(horizontal: 16,vertical: 1);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+      child: InkWell(
+        onTap: openBottomMenu,
+        onLongPress: getRepositoryData,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: ListTile(
+                    title: Text(
+                      _repo.name!,
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.primary),
+                    ),
+                    subtitle: Text(_repo.owner!),
                   ),
-                  subtitle: Text(_repo.owner!),
                 ),
-              ),
-              Flexible(
-                flex: 2,
-                child: ListTile(
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                Flexible(
+                  flex: 2,
+                  child: ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        newVersion
+                            ? const Icon(
+                                Icons.new_releases_outlined,
+                                color: Colors.green,
+                              )
+                            : const SizedBox.shrink(),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        loadingData
+                            ? const Padding(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                  ),
+                                ),
+                              )
+                            : Visibility(
+                                visible: _repo.releasePublishedDate != 'null',
+                                child: Chip(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  label: Text(_repo.releaseVersion!),
+                                  labelStyle: TextStyle(
+                                      fontSize: 12,
+                                      color: tagTextBrightness == Brightness.dark
+                                          ? lightenColor(
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              40)
+                                          : darkenColor(
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              50),
+                                      fontWeight: FontWeight.w500),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary
+                                      .withOpacity(0.4),
+                                ),
+                              ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+            (_repo.note!.isEmpty)
+                ? const SizedBox.shrink()
+                : Padding(
+                  padding: paddingText,
+                  child: Row(
                     children: [
-                      newVersion
-                          ? const Icon(
-                              Icons.new_releases_outlined,
-                              color: Colors.green,
-                            )
-                          : const SizedBox.shrink(),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      loadingData
-                          ? const Padding(
-                              padding: EdgeInsets.only(right: 20.0),
-                              child: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                ),
-                              ),
-                            )
-                          : Visibility(
-                              visible: _repo.releasePublishedDate != 'null',
-                              child: Chip(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                label: Text(_repo.releaseVersion!),
-                                labelStyle: TextStyle(
-                                    fontSize: 12,
-                                    color:
-                                        _tagTextBrightness == Brightness.dark
-                                            ? lightenColor(
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                                40)
-                                            : darkenColor(
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                                50),
-                                    fontWeight: FontWeight.w600),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondary
-                                    .withOpacity(0.4),
-                              ),
-                            ),
+                      Text(
+                          _repo.note!,
+                          style: styleTitleText
+                        ),
                     ],
                   ),
                 ),
-              )
-            ],
-          ),
-          _repo.releasePublishedDate != 'null'
-              ? Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: ListTile(
-                        subtitle: Text(
-                          Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                          style: _styleLatestText,
+            _repo.releasePublishedDate != 'null'
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: paddingText,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Latest update",
+                              style: styleTitleText,
+                            ),
+                            Text(
+                              Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                              style: styleTrailingText,
+                            ),
+                          ],
                         ),
-                        title: Text(
+                      ),
+                      Padding(
+                        padding: paddingText,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Latest release ",
+                              style: styleTitleText,
+                            ),
+                            _repo.releasePublishedDate == 'null'
+                                ? Text(
+                                    'No releases',
+                                    style: styleTrailingText,
+                                  )
+                                : Text(
+                                    Jiffy(_repo.releasePublishedDate!)
+                                        .format("dd/MM/yyyy"),
+                                    style: styleTrailingText,
+                                  ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Padding(
+                  padding: paddingText,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           "Latest update",
-                          style: _styleLatestText,
+                          style: styleTitleText,
                         ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: ListTile(
-                        subtitle: _repo.releasePublishedDate == 'null'
-                            ? Text(
-                                'No releases',
-                                style: _styleLatestText,
-                                textAlign: TextAlign.end,
-                              )
-                            : Text(
-                                Jiffy(_repo.releasePublishedDate!)
-                                    .format("dd/MM/yyyy"),
-                                style: _styleLatestText,
-                                textAlign: TextAlign.end,
-                              ),
-                        title: Text(
-                          "Latest release ",
-                          style: _styleLatestText,
-                          textAlign: TextAlign.end,
+                        Text(
+                          Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
+                          style: styleTrailingText,
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                )
-              : ListTile(
-                  title: Text(
-                    "Latest update",
-                    style: _styleLatestText,
-                  ),
-                  trailing: Text(
-                    Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                    style: _styleLatestText,
-                    textAlign: TextAlign.end,
-                  ),
                 ),
-        ],
+          ],
+        ),
       ),
     );
   }

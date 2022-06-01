@@ -52,7 +52,7 @@ class _NewRepositoryState extends State<NewRepository> {
       _repo.releaseVersion = _release.version;
       _repo.releasePublishedDate = _release.publishedDate;
 
-      await _saveRepository();
+      _saveRepository();
       widget.refreshList();
     } else {
       Fluttertoast.showToast(
@@ -96,7 +96,7 @@ class _NewRepositoryState extends State<NewRepository> {
             icon: const Icon(
               Icons.save_outlined,
             ),
-            onPressed: () {
+            onPressed: () async {
               if (validateTextFields()) {
                 getRepositoryDataAndSave().then(
                         (v) => Navigator.of(context).pop()
