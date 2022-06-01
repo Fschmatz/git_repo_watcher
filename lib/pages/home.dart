@@ -82,41 +82,41 @@ class _HomeState extends State<Home> {
               : ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) => const Divider(),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: repositoriesList.length,
-                      itemBuilder: (context, index) {
-                        return RepositoryTile(
-                          key: UniqueKey(),
-                          refreshList: getAllSavedRepositories,
-                          repository: Repository(
-                            id: repositoriesList[index]['id'],
-                            name: repositoriesList[index]['name'],
-                            note: repositoriesList[index]['note'],
-                            link: repositoriesList[index]['link'],
-                            idGit:
-                                int.parse(repositoriesList[index]['idGit']),
-                            owner: repositoriesList[index]['owner'],
-                            lastUpdate: repositoriesList[index]
-                                ['lastUpdate'],
-                            defaultBranch: repositoriesList[index]
-                                ['defaultBranch'],
-                            releaseLink: repositoriesList[index]
-                                ['releaseLink'],
-                            releaseVersion: repositoriesList[index]
-                                ['releaseVersion'],
-                            releasePublishedDate: repositoriesList[index]
-                                ['releasePublishedDate'],
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    )
-                  ]),
+                      ListView.separated(
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(height: 0,),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: repositoriesList.length,
+                        itemBuilder: (context, index) {
+                          return RepositoryTile(
+                            key: UniqueKey(),
+                            refreshList: getAllSavedRepositories,
+                            repository: Repository(
+                              id: repositoriesList[index]['id'],
+                              name: repositoriesList[index]['name'],
+                              note: repositoriesList[index]['note'],
+                              link: repositoriesList[index]['link'],
+                              idGit:
+                                  int.parse(repositoriesList[index]['idGit']),
+                              owner: repositoriesList[index]['owner'],
+                              lastUpdate: repositoriesList[index]['lastUpdate'],
+                              defaultBranch: repositoriesList[index]
+                                  ['defaultBranch'],
+                              releaseLink: repositoriesList[index]
+                                  ['releaseLink'],
+                              releaseVersion: repositoriesList[index]
+                                  ['releaseVersion'],
+                              releasePublishedDate: repositoriesList[index]
+                                  ['releasePublishedDate'],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 50,
+                      )
+                    ]),
         ),
       ),
     );

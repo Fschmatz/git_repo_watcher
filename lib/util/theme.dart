@@ -10,7 +10,7 @@ ThemeData light = ThemeData(
     colorScheme: const ColorScheme.light(
       primary: Color(0xFF00B591),
       onSecondary: Color(0xFF00A6B5),
-      secondary: Color(0xFF00B591),
+      secondary: Color(0xFF01B08F),
     ),
     appBarTheme: const AppBarTheme(
         surfaceTintColor: Color(0xFFF0F2F5),
@@ -71,7 +71,7 @@ ThemeData dark = ThemeData(
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFF73E3A6),
       onSecondary: Color(0xFF22B0D4),
-      secondary: Color(0xFF73E3A6),
+      secondary: Color(0xFF5FBD8A),
     ),
     appBarTheme: const AppBarTheme(
         surfaceTintColor:  Color(0xFF1F242A),

@@ -240,20 +240,20 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
     final TextStyle styleTrailingText = TextStyle(
       color: Theme.of(context).hintColor,
-        fontSize: 14,
+        fontSize: 12,
       fontWeight: FontWeight.w400
     );
 
     TextStyle styleTitleText = TextStyle(
         color: Theme.of(context).hintColor,
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: FontWeight.w400
     );
 
     EdgeInsets paddingText = const EdgeInsets.symmetric(horizontal: 16,vertical: 1);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
       child: InkWell(
         onTap: openBottomMenu,
         onLongPress: getRepositoryData,
@@ -266,10 +266,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   child: ListTile(
                     title: Text(
                       _repo.name!,
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.primary),
                     ),
-                    subtitle: Text(_repo.owner!),
+                    subtitle: Text(_repo.owner!,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.secondary
+                        )
+                    ),
                   ),
                 ),
                 Flexible(
@@ -339,7 +342,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     children: [
                       Text(
                           _repo.note!,
-                          style: styleTitleText
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).hintColor,
+                              fontWeight: FontWeight.w400
+                          ),
                         ),
                     ],
                   ),
