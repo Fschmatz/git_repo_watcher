@@ -1,5 +1,6 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:git_repo_watcher/pages/print_repo_list.dart';
 import '../../util/app_details.dart';
 import '../../util/dialog_select_theme.dart';
 import 'app_info_page.dart';
@@ -63,10 +64,22 @@ class _SettingsPageState extends State<SettingsPage> {
                   }),
               leading: const Icon(Icons.brightness_6_outlined),
               title: const Text(
-                "App Theme",
+                "App theme",
               ),
               subtitle: Text(
                 getThemeStringFormatted(),
+              ),
+            ),
+            ListTile(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => PrintRepoList(),
+                    fullscreenDialog: true,
+                  )),
+              leading: const Icon(Icons.print_outlined),
+              title: const Text(
+                "Print repository list",
               ),
             ),
             ListTile(
@@ -81,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Icons.info_outline,
               ),
               title: const Text(
-                "App Info",
+                "App info",
               ),
               onTap: () {
                 Navigator.push(
@@ -118,7 +131,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Icons.report_problem_outlined,
               ),
               title: Text(
-                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold tap on item).",
+                "GitHub only allows 60 API calls per hour for each IP, so the app will only update the items with user action (Hold on item).",
               ),
             ),
           ],
