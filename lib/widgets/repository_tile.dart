@@ -30,7 +30,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
   String savedLink = '';
   String oldDate = '';
 
-
   @override
   void initState() {
     formattedRepositoryData = widget.repository.link!.split('/');
@@ -46,18 +45,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
     //REPO
     final responseRepo = await http.get(Uri.parse(
-        "https://api.github.com/repos/" +
-            formattedRepositoryData[3] +
-            "/" +
-            formattedRepositoryData[4]));
+        "https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
 
     //RELEASE
     final responseRelease = await http.get(Uri.parse(
-        "https://api.github.com/repos/" +
-            formattedRepositoryData[3] +
-            "/" +
-            formattedRepositoryData[4] +
-            "/releases/latest"));
+        "https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"));
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
@@ -69,6 +61,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
       _repo.note = widget.repository.note;
 
       await _update();
+      widget.repository.releaseLink = _repo.releaseLink;
 
       if (mounted) {
         setState(() {
@@ -167,9 +160,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
-                      _launchPage(widget.repository.link! +
-                          "/commits/" +
-                          widget.repository.defaultBranch!);
+                      _launchPage(
+                          "${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
                     },
                   ),
                   const Divider(),
@@ -239,24 +231,23 @@ class _RepositoryTileState extends State<RepositoryTile> {
     final Brightness tagTextBrightness = Theme.of(context).brightness;
 
     final TextStyle styleTrailingDataText = TextStyle(
-      color: Theme.of(context).hintColor,
+        color: Theme.of(context).hintColor,
         fontSize: 12,
-      fontWeight: FontWeight.w400
-    );
+        fontWeight: FontWeight.w400);
 
     TextStyle styleTitleText = TextStyle(
         color: Theme.of(context).hintColor,
         fontSize: 14,
-        fontWeight: FontWeight.w400
-    );
+        fontWeight: FontWeight.w400);
 
-    EdgeInsets paddingText = const EdgeInsets.symmetric(horizontal: 16,vertical: 2);
+    EdgeInsets paddingText =
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 2);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-      child: InkWell(
-        onTap: openBottomMenu,
-        onLongPress: getRepositoryData,
+    return InkWell(
+      onTap: openBottomMenu,
+      onLongPress: getRepositoryData,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
         child: Column(
           children: [
             Row(
@@ -270,9 +261,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     subtitle: Text(_repo.owner!,
                         style: TextStyle(
                             fontSize: 12,
-                            color: Theme.of(context).colorScheme.secondary
-                        )
-                    ),
+                            color: Theme.of(context).colorScheme.secondary)),
                   ),
                 ),
                 Flexible(
@@ -310,17 +299,18 @@ class _RepositoryTileState extends State<RepositoryTile> {
                                   label: Text(_repo.releaseVersion!),
                                   labelStyle: TextStyle(
                                       fontSize: 12,
-                                      color: tagTextBrightness == Brightness.dark
-                                          ? lightenColor(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary,
-                                              40)
-                                          : darkenColor(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary,
-                                              50),
+                                      color:
+                                          tagTextBrightness == Brightness.dark
+                                              ? lightenColor(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary,
+                                                  40)
+                                              : darkenColor(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary,
+                                                  50),
                                       fontWeight: FontWeight.w500),
                                   backgroundColor: Theme.of(context)
                                       .colorScheme
@@ -337,20 +327,19 @@ class _RepositoryTileState extends State<RepositoryTile> {
             (_repo.note!.isEmpty)
                 ? const SizedBox.shrink()
                 : Padding(
-                  padding: paddingText,
-                  child: Row(
-                    children: [
-                      Text(
+                    padding: paddingText,
+                    child: Row(
+                      children: [
+                        Text(
                           _repo.note!,
                           style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(context).hintColor,
-                              fontWeight: FontWeight.w400
-                          ),
+                              fontWeight: FontWeight.w400),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
             _repo.releasePublishedDate != 'null'
                 ? Column(
                     children: [
@@ -395,8 +384,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     ],
                   )
                 : Padding(
-                  padding: paddingText,
-                  child: Row(
+                    padding: paddingText,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -409,7 +398,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                         ),
                       ],
                     ),
-                ),
+                  ),
           ],
         ),
       ),

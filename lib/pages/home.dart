@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
                           ));
                     }),
                 const SizedBox(
-                  width: 10,
+                  width: 8,
                 ),
                 IconButton(
                     icon: const Icon(
