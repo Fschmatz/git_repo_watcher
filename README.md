@@ -2,4 +2,4 @@
 
 Flutter project.
 
-<img src="https://user-images.githubusercontent.com/21291813/156470554-961f0bee-b21a-4c97-96b8-8a5a41f74912.png" width="30%"></img>  
+<img src="https://user-images.githubusercontent.com/21291813/172202670-533a20cf-887f-4b48-a8c1-d5edde8373bc.png" width="30%"></img>
