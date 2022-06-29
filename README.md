@@ -1,5 +1,6 @@
 # Git Repo Watcher
 
-Flutter project.
+Flutter project.</br>
+Application to create a library of Github repositories and keep track of their updates
 
-<img src="https://user-images.githubusercontent.com/21291813/172202670-533a20cf-887f-4b48-a8c1-d5edde8373bc.png" width="30%"></img>
+<img src="https://user-images.githubusercontent.com/21291813/176555500-6dbd7abb-b55a-4b83-a140-80b7fe4fd21d.png" width="30%"></img> 
