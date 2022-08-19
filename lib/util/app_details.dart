@@ -1,11 +1,11 @@
 class AppDetails{
 
-  static String appVersion = "1.3.2";
+  static String appVersion = "1.3.3";
   static String appName = "Git Repo Watcher Fschmatz";
   static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
 
   static String changelogCurrent = ''' 
-1.3.2
+1.3.3
 - Repository note
 - UI changes
 - Bug fix

@@ -54,22 +54,22 @@ ThemeData dark = ThemeData(
       titleMedium: TextStyle(fontWeight: FontWeight.w400),
     ),
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFF1F242A),
-    scaffoldBackgroundColor: const Color(0xFF1F242A),
+    primaryColor: const Color(0xFF1C2127),
+    scaffoldBackgroundColor: const Color(0xFF1C2127),
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFF73E3A6),
       onSecondary: Color(0xFF22B0D4),
       secondary: Color(0xFF60B286),
     ),
     appBarTheme: const AppBarTheme(
-      surfaceTintColor: Color(0xFF1F242A),
-      color: Color(0xFF1F242A),
+      surfaceTintColor: Color(0xFF1C2127),
+      color: Color(0xFF1C2127),
     ),
     cardTheme: const CardTheme(
-      color: Color(0xFF1F242A),
+      color: Color(0xFF1C2127),
     ),
     dialogTheme: const DialogTheme(
-      backgroundColor: Color(0xFF1F242A),
+      backgroundColor: Color(0xFF1C2127),
     ),
     inputDecorationTheme: InputDecorationTheme(
         focusColor: const Color(0xFF73E3A6),
@@ -90,8 +90,8 @@ ThemeData dark = ThemeData(
             ),
             borderRadius: BorderRadius.circular(8.0))),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1F242A),
+      backgroundColor: Color(0xFF1C2127),
     ),
-    bottomAppBarColor: const Color(0xFF1F242A),
+    bottomAppBarColor: const Color(0xFF1C2127),
     bottomSheetTheme:
-        const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1F242A)));
+        const BottomSheetThemeData(modalBackgroundColor: Color(0xFF1C2127)));

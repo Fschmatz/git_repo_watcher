@@ -56,9 +56,6 @@ class _HomeState extends State<Home> {
                             ),
                           ));
                     }),
-                const SizedBox(
-                  width: 8,
-                ),
                 IconButton(
                     icon: const Icon(
                       Icons.settings_outlined,
@@ -84,7 +81,9 @@ class _HomeState extends State<Home> {
                   children: [
                       ListView.separated(
                         separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(height: 0,),
+                            const Divider(
+                          height: 0,
+                        ),
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: repositoriesList.length,

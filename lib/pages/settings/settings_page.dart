@@ -75,7 +75,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) => PrintRepoList(),
-                    fullscreenDialog: true,
                   )),
               leading: const Icon(Icons.print_outlined),
               title: const Text(
