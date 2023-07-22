@@ -105,12 +105,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
       RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
     };
-    final update = await repositories.update(row);
+    await repositories.update(row);
   }
 
   Future<void> _delete() async {
     final repositories = RepositoryDao.instance;
-    final deleted = await repositories.delete(_repo.id!);
+    await repositories.delete(_repo.id!);
   }
 
   void showNewReleaseIcon() {
@@ -128,72 +128,89 @@ class _RepositoryTileState extends State<RepositoryTile> {
     );
   }
 
+  String getFormattedDate(String date) { //format(['dd/MM/yyyy'])
+    return Jiffy.parse(date).format(pattern: 'dd/MM/yyyy');
+  }
+
   void openBottomMenu() {
+    TextStyle infoStyle =
+        const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
+
     showModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
-        ),
         isScrollControlled: true,
+        showDragHandle: true,
         context: context,
         builder: (BuildContext bc) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Wrap(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.open_in_new_outlined),
-                    title: const Text(
-                      "View repository",
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _launchPage(widget.repository.link!);
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.open_in_new_outlined),
-                    title: const Text(
-                      "View default branch commits",
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _launchPage(
-                          "${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
-                    },
-                  ),
-                  const Divider(),
-                  Visibility(
-                    visible: _repo.releasePublishedDate! != 'null',
-                    child: ListTile(
-                      leading: const Icon(Icons.open_in_new_outlined),
-                      title: const Text(
-                        "View latest release",
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _launchPage(widget.repository.releaseLink!);
-                      },
-                    ),
-                  ),
-                  Visibility(
-                      visible: _repo.releasePublishedDate! != 'null',
-                      child: const Divider()),
-                  ListTile(
-                    leading: const Icon(Icons.delete_outline_outlined),
-                    title: const Text(
-                      "Delete",
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      showAlertDialogOkDelete(context);
-                    },
-                  ),
-                ],
+          return Wrap(
+            children: <Widget>[
+              ListTile(
+                title: Text(_repo.name!,
+                    textAlign: TextAlign.center, style: infoStyle),
               ),
-            ),
+              (_repo.note!.isEmpty)
+                  ? const SizedBox.shrink()
+                  : ListTile(
+                      leading: Text(_repo.note!, style: infoStyle),
+                    ),
+              (_repo.lastUpdate == 'null')
+                  ? const SizedBox.shrink()
+                  : ListTile(
+                      leading: Text("Latest update", style: infoStyle),
+                      trailing: Text(getFormattedDate(_repo.lastUpdate!),
+                          style: infoStyle),
+                    ),
+              (_repo.releasePublishedDate == 'null')
+                  ? const SizedBox.shrink()
+                  : ListTile(
+                      leading: Text("Latest release", style: infoStyle),
+                      trailing: Text(
+                          getFormattedDate(_repo.releasePublishedDate!),
+                          style: infoStyle),
+                    ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.open_in_new_outlined),
+                title: Text("View repository", style: infoStyle),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _launchPage(widget.repository.link!);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.open_in_new_outlined),
+                title: const Text(
+                  "View default branch commits",
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _launchPage(
+                      "${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
+                },
+              ),
+              Visibility(
+                visible: _repo.releasePublishedDate! != 'null',
+                child: ListTile(
+                  leading: const Icon(Icons.open_in_new_outlined),
+                  title: const Text(
+                    "View latest release",
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _launchPage(widget.repository.releaseLink!);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline_outlined),
+                title: const Text(
+                  "Delete",
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showAlertDialogOkDelete(context);
+                },
+              ),
+            ],
           );
         });
   }
@@ -230,24 +247,16 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Widget build(BuildContext context) {
     final Brightness tagTextBrightness = Theme.of(context).brightness;
 
-    final TextStyle styleTrailingDataText = TextStyle(
-        color: Theme.of(context).hintColor,
-        fontSize: 12,
-        fontWeight: FontWeight.w400);
-
-    TextStyle styleTitleText = TextStyle(
-        color: Theme.of(context).hintColor,
-        fontSize: 14,
-        fontWeight: FontWeight.w400);
-
-    EdgeInsets paddingText =
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 2);
+    String versionFormatted = _repo.releaseVersion!;
+    if (_repo.releaseVersion!.length > 14) {
+      versionFormatted = "${_repo.releaseVersion!.substring(0, 11)}...";
+    }
 
     return InkWell(
       onTap: openBottomMenu,
       onLongPress: getRepositoryData,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
         child: Column(
           children: [
             Row(
@@ -267,6 +276,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                 Flexible(
                   flex: 2,
                   child: ListTile(
+                    contentPadding: EdgeInsets.fromLTRB(0, 0, 16, 0),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -296,7 +306,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  label: Text(_repo.releaseVersion!),
+                                  label: Text(versionFormatted),
+                                  side: const BorderSide(
+                                    color: Colors.transparent,
+                                  ),
                                   labelStyle: TextStyle(
                                       fontSize: 12,
                                       color:
@@ -324,81 +337,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
                 )
               ],
             ),
-            (_repo.note!.isEmpty)
-                ? const SizedBox.shrink()
-                : Padding(
-                    padding: paddingText,
-                    child: Row(
-                      children: [
-                        Text(
-                          _repo.note!,
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).hintColor,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                  ),
-            _repo.releasePublishedDate != 'null'
-                ? Column(
-                    children: [
-                      Padding(
-                        padding: paddingText,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Latest update",
-                              style: styleTitleText,
-                            ),
-                            Text(
-                              Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                              style: styleTrailingDataText,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: paddingText,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Latest release ",
-                              style: styleTitleText,
-                            ),
-                            _repo.releasePublishedDate == 'null'
-                                ? Text(
-                                    'No releases',
-                                    style: styleTrailingDataText,
-                                  )
-                                : Text(
-                                    Jiffy(_repo.releasePublishedDate!)
-                                        .format("dd/MM/yyyy"),
-                                    style: styleTrailingDataText,
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Padding(
-                    padding: paddingText,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Latest update",
-                          style: styleTitleText,
-                        ),
-                        Text(
-                          Jiffy(_repo.lastUpdate!).format("dd/MM/yyyy"),
-                          style: styleTrailingDataText,
-                        ),
-                      ],
-                    ),
-                  ),
           ],
         ),
       ),

@@ -36,7 +36,7 @@ class _AppState extends State<App> {
           systemStatusBarContrastEnforced: false,
           systemNavigationBarIconBrightness: iconBrightness,
         ),
-        child: const SafeArea(child: Home())
+        child: const Home()
     );
   }
 }

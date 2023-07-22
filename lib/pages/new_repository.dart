@@ -90,25 +90,6 @@ class _NewRepositoryState extends State<NewRepository> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            tooltip: 'Save',
-            icon: const Icon(
-              Icons.save_outlined,
-            ),
-            onPressed: () async {
-              if (validateTextFields()) {
-                getRepositoryDataAndSave().then(
-                        (v) => Navigator.of(context).pop()
-                );
-              } else {
-                setState(() {
-                  _validLink;
-                });
-              }
-            },
-          )
-        ],
         title: const Text('New Repository'),
       ),
       body: ListView(
@@ -146,6 +127,28 @@ class _NewRepositoryState extends State<NewRepository> {
                   counterText: "",
               ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+            child: FilledButton.tonalIcon(
+                onPressed: () async {
+                  if (validateTextFields()) {
+                    getRepositoryDataAndSave().then(
+                            (v) => Navigator.of(context).pop()
+                    );
+                  } else {
+                    setState(() {
+                      _validLink;
+                    });
+                  }
+                },
+                icon: Icon(Icons.save_outlined,
+                    color: Theme.of(context).colorScheme.onPrimary),
+                label: Text(
+                  'Save',
+                  style:
+                  TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                )),
           ),
         ],
       ),

@@ -32,7 +32,7 @@ class AppInfoPage extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Center(
-            child: Text(AppDetails.appName + " " + AppDetails.appVersion,
+            child: Text("${AppDetails.appName} ${AppDetails.appVersion}",
                 style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
@@ -66,7 +66,9 @@ class AppInfoPage extends StatelessWidget {
             leading: const Icon(Icons.open_in_new_outlined),
             title: const Text("View on GitHub",
                 style: TextStyle(
-                    decoration: TextDecoration.underline, color: Colors.blue)),
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.blue,
+                    color: Colors.blue)),
           ),
           ListTile(
             title: Text("Quote",

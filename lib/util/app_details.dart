@@ -1,19 +1,23 @@
 class AppDetails{
 
-  static String appVersion = "1.3.3";
+  static String appVersion = "1.4.0";
   static String appName = "Git Repo Watcher Fschmatz";
   static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
 
   static String changelogCurrent = ''' 
+1.4.0
+- UI changes
+- Bug fixes
+''';
+
+  static String changelogsOld = '''
 1.3.3
 - Repository note
 - UI changes
 - Bug fix
 - Print list
 - Flutter 3
-''';
-
-  static String changelogsOld = '''  
+  
 1.2.0  
 - UI changes
 - Bug fix
