@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<Map<String, dynamic>> repositoriesList = [];
   bool loading = true;
+  bool refreshAllRepositories = false;
 
   @override
   void initState() {
@@ -92,6 +93,7 @@ class _HomeState extends State<Home> {
                             return RepositoryTile(
                               key: UniqueKey(),
                               refreshList: getAllSavedRepositories,
+                              refreshAllRepositories: refreshAllRepositories,
                               repository: Repository(
                                 id: repositoriesList[index]['id'],
                                 name: repositoriesList[index]['name'],
@@ -118,6 +120,18 @@ class _HomeState extends State<Home> {
                         )
                       ]),
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: () {
+          setState(() {
+            refreshAllRepositories = true;
+          });
+        },
+        child: Icon(
+          Icons.refresh_outlined,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
     );

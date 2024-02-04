@@ -1,11 +1,12 @@
 class AppDetails{
 
-  static String appVersion = "1.4.0";
+  static String appVersion = "1.4.1";
   static String appName = "Git Repo Watcher Fschmatz";
   static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
 
   static String changelogCurrent = ''' 
-1.4.0
+1.4.1
+- Add Refresh All FAB
 - UI changes
 - Bug fixes
 ''';

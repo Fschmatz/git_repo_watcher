@@ -12,9 +12,10 @@ import '../util/utils_functions.dart';
 class RepositoryTile extends StatefulWidget {
   Repository repository;
   Function refreshList;
+  bool  refreshAllRepositories;
 
   RepositoryTile(
-      {Key? key, required this.repository, required this.refreshList})
+      {Key? key, required this.repository, required this.refreshList, required this.refreshAllRepositories})
       : super(key: key);
 
   @override
@@ -35,6 +36,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
     formattedRepositoryData = widget.repository.link!.split('/');
     _repo = widget.repository;
     oldDate = widget.repository.releasePublishedDate!;
+
+    if(widget.refreshAllRepositories) {
+      getRepositoryData();
+    }
+
     super.initState();
   }
 
