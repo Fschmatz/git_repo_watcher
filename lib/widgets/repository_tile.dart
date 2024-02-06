@@ -77,6 +77,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
         showNewReleaseIcon();
       }
     } else if (responseRepo.statusCode == 403) {
+      setState(() {
+        loadingData = false;
+        _repo;
+      });
       Fluttertoast.showToast(
         msg: "API Limit",
       );

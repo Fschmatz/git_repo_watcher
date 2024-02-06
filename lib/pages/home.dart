@@ -116,7 +116,7 @@ class _HomeState extends State<Home> {
                           },
                         ),
                         const SizedBox(
-                          height: 50,
+                          height: 100,
                         )
                       ]),
           ),
