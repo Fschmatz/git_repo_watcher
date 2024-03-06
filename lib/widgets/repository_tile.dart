@@ -12,10 +12,13 @@ import '../util/utils_functions.dart';
 class RepositoryTile extends StatefulWidget {
   Repository repository;
   Function refreshList;
-  bool  refreshAllRepositories;
+  bool refreshAllRepositories;
 
   RepositoryTile(
-      {Key? key, required this.repository, required this.refreshList, required this.refreshAllRepositories})
+      {Key? key,
+      required this.repository,
+      required this.refreshList,
+      required this.refreshAllRepositories})
       : super(key: key);
 
   @override
@@ -37,7 +40,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
     _repo = widget.repository;
     oldDate = widget.repository.releasePublishedDate!;
 
-    if(widget.refreshAllRepositories) {
+    if (widget.refreshAllRepositories) {
       getRepositoryData();
     }
 
@@ -102,19 +105,42 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   Future<void> _update() async {
     final repositories = RepositoryDao.instance;
-    Map<String, dynamic> row = {
-      RepositoryDao.columnId: _repo.id,
-      RepositoryDao.columnName: _repo.name,
-      RepositoryDao.columnLink: _repo.link,
-      RepositoryDao.columnNote: _repo.note,
-      RepositoryDao.columnIdGit: _repo.idGit,
-      RepositoryDao.columnOwner: _repo.owner,
-      RepositoryDao.columnDefaultBranch: _repo.defaultBranch,
-      RepositoryDao.columnLastUpdate: _repo.lastUpdate,
-      RepositoryDao.columnReleaseLink: _repo.releaseLink,
-      RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
-      RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
-    };
+    Map<String, dynamic> row = {};
+
+    row[RepositoryDao.columnId] = _repo.id;
+    if (_repo.name != null && _repo.name!.isNotEmpty) {
+      row[RepositoryDao.columnName] = _repo.name;
+    }
+    if (_repo.link != null && _repo.link!.isNotEmpty) {
+      row[RepositoryDao.columnLink] = _repo.link;
+    }
+    if (_repo.note != null && _repo.note!.isNotEmpty) {
+      row[RepositoryDao.columnNote] = _repo.note;
+    }
+    if (_repo.idGit != null) {
+      row[RepositoryDao.columnIdGit] = _repo.idGit;
+    }
+    if (_repo.owner != null && _repo.owner!.isNotEmpty) {
+      row[RepositoryDao.columnOwner] = _repo.owner;
+    }
+    if (_repo.defaultBranch != null && _repo.defaultBranch!.isNotEmpty) {
+      row[RepositoryDao.columnDefaultBranch] = _repo.defaultBranch;
+    }
+    if (_repo.lastUpdate != null && _repo.lastUpdate!.isNotEmpty) {
+      row[RepositoryDao.columnLastUpdate] = _repo.lastUpdate;
+    }
+    if (_repo.releaseLink != null && _repo.releaseLink!.isNotEmpty) {
+      row[RepositoryDao.columnReleaseLink] = _repo.releaseLink;
+    }
+    if (_repo.releaseVersion != null && _repo.releaseVersion!.isNotEmpty) {
+      row[RepositoryDao.columnReleaseVersion] = _repo.releaseVersion;
+    }
+    if (_repo.releasePublishedDate != null &&
+        _repo.releasePublishedDate!.isNotEmpty) {
+      row[RepositoryDao.columnReleasePublishedDate] =
+          _repo.releasePublishedDate;
+    }
+
     await repositories.update(row);
   }
 
@@ -124,10 +150,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   void showNewReleaseIcon() {
-    if (oldDate != _repo.releasePublishedDate) {
-      setState(() {
-        newVersion = !newVersion;
-      });
+    if (oldDate.isNotEmpty &&
+        _repo.releasePublishedDate != null &&
+        _repo.releasePublishedDate!.isNotEmpty) {
+      if (oldDate != _repo.releasePublishedDate) {
+        setState(() {
+          newVersion = !newVersion;
+        });
+      }
     }
   }
 
@@ -138,7 +168,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
     );
   }
 
-  String getFormattedDate(String date) { //format(['dd/MM/yyyy'])
+  String getFormattedDate(String date) {
     return Jiffy.parse(date).format(pattern: 'dd/MM/yyyy');
   }
 
