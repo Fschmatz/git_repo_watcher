@@ -7,19 +7,13 @@ import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../classes/release.dart';
 import '../db/repository_dao.dart';
-import '../util/utils_functions.dart';
 
 class RepositoryTile extends StatefulWidget {
   Repository repository;
   Function refreshList;
   bool refreshAllRepositories;
 
-  RepositoryTile(
-      {Key? key,
-      required this.repository,
-      required this.refreshList,
-      required this.refreshAllRepositories})
-      : super(key: key);
+  RepositoryTile({Key? key, required this.repository, required this.refreshList, required this.refreshAllRepositories}) : super(key: key);
 
   @override
   _RepositoryTileState createState() => _RepositoryTileState();
@@ -53,12 +47,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
     });
 
     //REPO
-    final responseRepo = await http.get(Uri.parse(
-        "https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
+    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
 
     //RELEASE
-    final responseRelease = await http.get(Uri.parse(
-        "https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"));
+    final responseRelease =
+        await http.get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"));
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
@@ -72,13 +65,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
       await _update();
       widget.repository.releaseLink = _repo.releaseLink;
 
-      if (mounted) {
-        setState(() {
-          loadingData = false;
-          _repo;
-        });
-        showNewReleaseIcon();
-      }
+      setState(() {
+        loadingData = false;
+        _repo;
+      });
+      showNewReleaseIcon();
     } else if (responseRepo.statusCode == 403) {
       setState(() {
         loadingData = false;
@@ -135,10 +126,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
     if (_repo.releaseVersion != null && _repo.releaseVersion!.isNotEmpty) {
       row[RepositoryDao.columnReleaseVersion] = _repo.releaseVersion;
     }
-    if (_repo.releasePublishedDate != null &&
-        _repo.releasePublishedDate!.isNotEmpty) {
-      row[RepositoryDao.columnReleasePublishedDate] =
-          _repo.releasePublishedDate;
+    if (_repo.releasePublishedDate != null && _repo.releasePublishedDate!.isNotEmpty) {
+      row[RepositoryDao.columnReleasePublishedDate] = _repo.releasePublishedDate;
     }
 
     await repositories.update(row);
@@ -150,9 +139,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   void showNewReleaseIcon() {
-    if (oldDate.isNotEmpty &&
-        _repo.releasePublishedDate != null &&
-        _repo.releasePublishedDate!.isNotEmpty) {
+    if (oldDate.isNotEmpty && _repo.releasePublishedDate != null && _repo.releasePublishedDate!.isNotEmpty) {
       if (oldDate != _repo.releasePublishedDate) {
         setState(() {
           newVersion = !newVersion;
@@ -173,84 +160,80 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   void openBottomMenu() {
-    TextStyle infoStyle =
-        const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
+    TextStyle infoStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
 
     showModalBottomSheet(
         isScrollControlled: true,
         showDragHandle: true,
         context: context,
         builder: (BuildContext bc) {
-          return Wrap(
-            children: <Widget>[
-              ListTile(
-                title: Text(_repo.name!,
-                    textAlign: TextAlign.center, style: infoStyle),
-              ),
-              (_repo.note!.isEmpty)
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text(_repo.note!, style: infoStyle),
-                    ),
-              (_repo.lastUpdate == 'null')
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text("Latest update", style: infoStyle),
-                      trailing: Text(getFormattedDate(_repo.lastUpdate!),
-                          style: infoStyle),
-                    ),
-              (_repo.releasePublishedDate == 'null')
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text("Latest release", style: infoStyle),
-                      trailing: Text(
-                          getFormattedDate(_repo.releasePublishedDate!),
-                          style: infoStyle),
-                    ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.open_in_new_outlined),
-                title: Text("View repository", style: infoStyle),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _launchPage(widget.repository.link!);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.open_in_new_outlined),
-                title: const Text(
-                  "View default branch commits",
+          return SafeArea(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  title: Text(_repo.name!, textAlign: TextAlign.center, style: infoStyle),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _launchPage(
-                      "${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
-                },
-              ),
-              Visibility(
-                visible: _repo.releasePublishedDate! != 'null',
-                child: ListTile(
+                (_repo.note!.isEmpty)
+                    ? const SizedBox.shrink()
+                    : ListTile(
+                        leading: Text(_repo.note!, style: infoStyle),
+                      ),
+                (_repo.lastUpdate == 'null')
+                    ? const SizedBox.shrink()
+                    : ListTile(
+                        leading: Text("Latest update", style: infoStyle),
+                        trailing: Text(getFormattedDate(_repo.lastUpdate!), style: infoStyle),
+                      ),
+                (_repo.releasePublishedDate == 'null')
+                    ? const SizedBox.shrink()
+                    : ListTile(
+                        leading: Text("Latest release", style: infoStyle),
+                        trailing: Text(getFormattedDate(_repo.releasePublishedDate!), style: infoStyle),
+                      ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.open_in_new_outlined),
+                  title: Text("View repository", style: infoStyle),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _launchPage(widget.repository.link!);
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.open_in_new_outlined),
                   title: const Text(
-                    "View latest release",
+                    "View default branch commits",
                   ),
                   onTap: () {
                     Navigator.of(context).pop();
-                    _launchPage(widget.repository.releaseLink!);
+                    _launchPage("${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
                   },
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline_outlined),
-                title: const Text(
-                  "Delete",
+                Visibility(
+                  visible: _repo.releasePublishedDate! != 'null',
+                  child: ListTile(
+                    leading: const Icon(Icons.open_in_new_outlined),
+                    title: const Text(
+                      "View latest release",
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _launchPage(widget.repository.releaseLink!);
+                    },
+                  ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  showAlertDialogOkDelete(context);
-                },
-              ),
-            ],
+                ListTile(
+                  leading: const Icon(Icons.delete_outline_outlined),
+                  title: const Text(
+                    "Delete",
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    showAlertDialogOkDelete(context);
+                  },
+                ),
+              ],
+            ),
           );
         });
   }
@@ -285,7 +268,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness tagTextBrightness = Theme.of(context).brightness;
+    final colorscheme = Theme.of(context).colorScheme;
 
     String versionFormatted = _repo.releaseVersion!;
     if (_repo.releaseVersion!.length > 14) {
@@ -307,23 +290,20 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     title: Text(
                       _repo.name!,
                     ),
-                    subtitle: Text(_repo.owner!,
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.secondary)),
+                    subtitle: Text(_repo.owner!, style: TextStyle(fontSize: 12, color: colorscheme.primary)),
                   ),
                 ),
                 Flexible(
                   flex: 2,
                   child: ListTile(
-                    contentPadding: EdgeInsets.fromLTRB(0, 0, 16, 0),
+                    contentPadding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         newVersion
-                            ? const Icon(
+                            ? Icon(
                                 Icons.new_releases_outlined,
-                                color: Colors.green,
+                                color: colorscheme.tertiary,
                               )
                             : const SizedBox.shrink(),
                         const SizedBox(
@@ -350,25 +330,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
                                   side: const BorderSide(
                                     color: Colors.transparent,
                                   ),
-                                  labelStyle: TextStyle(
-                                      fontSize: 12,
-                                      color:
-                                          tagTextBrightness == Brightness.dark
-                                              ? lightenColor(
-                                                  Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary,
-                                                  40)
-                                              : darkenColor(
-                                                  Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary,
-                                                  50),
-                                      fontWeight: FontWeight.w500),
-                                  backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondary
-                                      .withOpacity(0.4),
+                                  labelStyle: TextStyle(fontSize: 12, color: colorscheme.secondary, fontWeight: FontWeight.w500),
+                                  backgroundColor: colorscheme.secondaryContainer,
                                 ),
                               ),
                       ],

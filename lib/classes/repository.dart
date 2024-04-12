@@ -39,4 +39,19 @@ class Repository {
     );
   }
 
+  factory Repository.fromMap(Map<String, dynamic> map) {
+    return Repository(
+      id: map['id'],
+      name: map['name'],
+      note: map['note'],
+      link: map['link'],
+      idGit: int.parse(map['idGit']),
+      owner: map['owner'],
+      lastUpdate: map['lastUpdate'],
+      defaultBranch: map['defaultBranch'],
+      releaseLink: map['releaseLink'],
+      releaseVersion: map['releaseVersion'],
+      releasePublishedDate: map['releasePublishedDate'],
+    );
+  }
 }

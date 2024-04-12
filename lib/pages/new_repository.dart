@@ -15,7 +15,7 @@ class NewRepository extends StatefulWidget {
   @override
   _NewRepositoryState createState() => _NewRepositoryState();
 
-  NewRepository({Key? key,required this.refreshList}) : super(key: key);
+  NewRepository({Key? key, required this.refreshList}) : super(key: key);
 }
 
 class _NewRepositoryState extends State<NewRepository> {
@@ -26,26 +26,17 @@ class _NewRepositoryState extends State<NewRepository> {
   TextEditingController controllerRepoNote = TextEditingController();
   bool _validLink = true;
 
-
   Future<void> getRepositoryDataAndSave() async {
-    List<String> formattedRepositoryData =
-        controllerRepoLink.text.split('/');
+    List<String> formattedRepositoryData = controllerRepoLink.text.split('/');
 
     //REPO
-    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" +
-        formattedRepositoryData[3] +
-        "/" +
-        formattedRepositoryData[4]));
+    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" + formattedRepositoryData[3] + "/" + formattedRepositoryData[4]));
 
     //RELEASE
-    final responseRelease = await http.get(Uri.parse("https://api.github.com/repos/" +
-        formattedRepositoryData[3] +
-        "/" +
-        formattedRepositoryData[4]+"/releases/latest"));
-
+    final responseRelease = await http
+        .get(Uri.parse("https://api.github.com/repos/" + formattedRepositoryData[3] + "/" + formattedRepositoryData[4] + "/releases/latest"));
 
     if (responseRepo.statusCode == 200) {
-
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
       _release = Release.fromJSON(jsonDecode(responseRelease.body));
       _repo.releaseLink = _release.link;
@@ -109,6 +100,7 @@ class _NewRepositoryState extends State<NewRepository> {
                   labelText: "Link",
                   helperText: "* Required",
                   counterText: "",
+                  border: const OutlineInputBorder(),
                   errorText: (_validLink) ? null : "Link is empty"),
             ),
           ),
@@ -123,8 +115,9 @@ class _NewRepositoryState extends State<NewRepository> {
               keyboardType: TextInputType.name,
               controller: controllerRepoNote,
               decoration: const InputDecoration(
-                  labelText: "Note",
-                  counterText: "",
+                labelText: "Note",
+                counterText: "",
+                border: OutlineInputBorder(),
               ),
             ),
           ),
@@ -133,23 +126,18 @@ class _NewRepositoryState extends State<NewRepository> {
             child: FilledButton.tonalIcon(
                 onPressed: () async {
                   if (validateTextFields()) {
-                    getRepositoryDataAndSave().then(
-                            (v) => Navigator.of(context).pop()
-                    );
+                    getRepositoryDataAndSave().then((v) => Navigator.of(context).pop());
                   } else {
                     setState(() {
                       _validLink;
                     });
                   }
                 },
-                icon: Icon(Icons.save_outlined,
-                    color: Theme.of(context).colorScheme.onPrimary),
-                label: Text(
+                icon: const Icon(Icons.save_outlined),
+                label: const Text(
                   'Save',
-                  style:
-                  TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  ),
                 )),
-          ),
         ],
       ),
     );
