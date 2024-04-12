@@ -1,12 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../db/repository_dao.dart';
 import '../classes/release.dart';
 import '../classes/repository.dart';
-import '../widgets/dialog_alert_error.dart';
 import 'package:http/http.dart' as http;
 
 class NewRepository extends StatefulWidget {
@@ -30,11 +28,11 @@ class _NewRepositoryState extends State<NewRepository> {
     List<String> formattedRepositoryData = controllerRepoLink.text.split('/');
 
     //REPO
-    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/" + formattedRepositoryData[3] + "/" + formattedRepositoryData[4]));
+    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
 
     //RELEASE
     final responseRelease = await http
-        .get(Uri.parse("https://api.github.com/repos/" + formattedRepositoryData[3] + "/" + formattedRepositoryData[4] + "/releases/latest"));
+        .get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"));
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
