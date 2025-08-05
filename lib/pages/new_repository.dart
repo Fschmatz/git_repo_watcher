@@ -1,19 +1,21 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+
 import '../../db/repository_dao.dart';
 import '../classes/release.dart';
 import '../classes/repository.dart';
-import 'package:http/http.dart' as http;
 
 class NewRepository extends StatefulWidget {
-  Function refreshList;
+  final Function refreshList;
+
+  const NewRepository({Key? key, required this.refreshList}) : super(key: key);
 
   @override
-  _NewRepositoryState createState() => _NewRepositoryState();
-
-  NewRepository({Key? key, required this.refreshList}) : super(key: key);
+  State<NewRepository> createState() => _NewRepositoryState();
 }
 
 class _NewRepositoryState extends State<NewRepository> {
@@ -31,8 +33,9 @@ class _NewRepositoryState extends State<NewRepository> {
     final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
 
     //RELEASE
-    final responseRelease = await http
-        .get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"));
+    final responseRelease = await http.get(
+      Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"),
+    );
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
@@ -44,9 +47,7 @@ class _NewRepositoryState extends State<NewRepository> {
       _saveRepository();
       widget.refreshList();
     } else {
-      Fluttertoast.showToast(
-        msg: "Error Saving Repository Data",
-      );
+      Fluttertoast.showToast(msg: "Error Saving Repository Data");
     }
   }
 
@@ -78,9 +79,7 @@ class _NewRepositoryState extends State<NewRepository> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('New Repository'),
-      ),
+      appBar: AppBar(title: const Text('New Repository')),
       body: ListView(
         children: [
           Padding(
@@ -95,11 +94,12 @@ class _NewRepositoryState extends State<NewRepository> {
               keyboardType: TextInputType.name,
               controller: controllerRepoLink,
               decoration: InputDecoration(
-                  labelText: "Link",
-                  helperText: "* Required",
-                  counterText: "",
-                  border: const OutlineInputBorder(),
-                  errorText: (_validLink) ? null : "Link is empty"),
+                labelText: "Link",
+                helperText: "* Required",
+                counterText: "",
+                border: const OutlineInputBorder(),
+                errorText: (_validLink) ? null : "Link is empty",
+              ),
             ),
           ),
           Padding(
@@ -112,30 +112,25 @@ class _NewRepositoryState extends State<NewRepository> {
               textCapitalization: TextCapitalization.sentences,
               keyboardType: TextInputType.name,
               controller: controllerRepoNote,
-              decoration: const InputDecoration(
-                labelText: "Note",
-                counterText: "",
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: "Note", counterText: "", border: OutlineInputBorder()),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
             child: FilledButton.tonalIcon(
-                onPressed: () async {
-                  if (validateTextFields()) {
-                    getRepositoryDataAndSave().then((v) => Navigator.of(context).pop());
-                  } else {
-                    setState(() {
-                      _validLink;
-                    });
-                  }
-                },
-                icon: const Icon(Icons.save_outlined),
-                label: const Text(
-                  'Save',
-                  ),
-                )),
+              onPressed: () async {
+                if (validateTextFields()) {
+                  getRepositoryDataAndSave().then((v) => Navigator.of(context).pop());
+                } else {
+                  setState(() {
+                    _validLink;
+                  });
+                }
+              },
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('Save'),
+            ),
+          ),
         ],
       ),
     );

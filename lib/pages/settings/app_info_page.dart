@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../util/app_details.dart';
 
 class AppInfoPage extends StatelessWidget {
@@ -15,6 +16,7 @@ class AppInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color? themeColorApp = Theme.of(context).colorScheme.primary;
+    TextStyle textStyleSectionTitle = TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: themeColorApp);
 
     return Scaffold(
         appBar: AppBar(
@@ -33,18 +35,11 @@ class AppInfoPage extends StatelessWidget {
           const SizedBox(height: 15),
           Center(
             child: Text("${AppDetails.appName} ${AppDetails.appVersion}",
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: themeColorApp)),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: themeColorApp)),
           ),
           const SizedBox(height: 15),
           ListTile(
-            title: Text("Dev",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: themeColorApp)),
+            title: Text("Dev", style: textStyleSectionTitle),
           ),
           const ListTile(
             leading: Icon(Icons.info_outline),
@@ -53,11 +48,7 @@ class AppInfoPage extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: Text("Source Code",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: themeColorApp)),
+            title: Text("Source Code", style: textStyleSectionTitle),
           ),
           ListTile(
             onTap: () {
@@ -65,17 +56,10 @@ class AppInfoPage extends StatelessWidget {
             },
             leading: const Icon(Icons.open_in_new_outlined),
             title: const Text("View on GitHub",
-                style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.blue,
-                    color: Colors.blue)),
+                style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.blue, color: Colors.blue)),
           ),
           ListTile(
-            title: Text("Quote",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: themeColorApp)),
+            title: Text("Quote", style: textStyleSectionTitle),
           ),
           const ListTile(
             leading: Icon(Icons.messenger_outline),

@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:git_repo_watcher/db/repository_dao.dart';
 
 class PrintRepoList extends StatefulWidget {
-  PrintRepoList({Key? key}) : super(key: key);
+  const PrintRepoList({Key? key}) : super(key: key);
 
   @override
-  _PrintRepoListState createState() => _PrintRepoListState();
+  State<PrintRepoList> createState() => _PrintRepoListState();
 }
 
 class _PrintRepoListState extends State<PrintRepoList> {
@@ -40,9 +40,7 @@ class _PrintRepoListState extends State<PrintRepoList> {
         title: const Text('Print'),
         actions: [
           TextButton(
-            child: const Text(
-              "Copy",
-            ),
+            child: const Text("Copy"),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: formattedList));
               Navigator.of(context).pop();
@@ -53,13 +51,8 @@ class _PrintRepoListState extends State<PrintRepoList> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         children: [
-          (loading)
-              ? const SizedBox.shrink()
-              : SelectableText(
-                  formattedList,
-                  style: const TextStyle(fontSize: 16),
-                ),
-          const SizedBox(height: 30,)
+          (loading) ? const SizedBox.shrink() : SelectableText(formattedList, style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 30),
         ],
       ),
     );

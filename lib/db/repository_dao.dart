@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -31,8 +32,7 @@ class RepositoryDao {
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path,
-        version: _databaseVersion, onCreate: _onCreate);
+    return await openDatabase(path, version: _databaseVersion, onCreate: _onCreate);
   }
 
   Future _onCreate(Database db, int version) async {
@@ -70,8 +70,7 @@ class RepositoryDao {
 
   Future<List<Map<String, dynamic>>> queryAllRowsByName() async {
     Database db = await instance.database;
-    return await db
-        .rawQuery('SELECT * FROM $table ORDER BY $columnName COLLATE NOCASE');
+    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnName COLLATE NOCASE');
   }
 
   Future<int> update(Map<String, dynamic> row) async {
@@ -83,5 +82,24 @@ class RepositoryDao {
   Future<int> delete(int id) async {
     Database db = await instance.database;
     return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteAll() async {
+    Database db = await instance.database;
+    return await db.delete(table);
+  }
+
+  Future<void> insertBatchForBackup(List<Map<String, dynamic>> list) async {
+    Database db = await instance.database;
+
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+
+      for (final data in list) {
+        batch.insert(table, data);
+      }
+
+      await batch.commit(noResult: true);
+    });
   }
 }

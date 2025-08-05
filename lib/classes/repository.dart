@@ -54,4 +54,20 @@ class Repository {
       releasePublishedDate: map['releasePublishedDate'],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'note': note,
+      'link': link,
+      'idGit': idGit.toString(),
+      'owner': owner,
+      'lastUpdate': lastUpdate,
+      'defaultBranch': defaultBranch,
+      'releaseLink': releaseLink,
+      'releaseVersion': releaseVersion,
+      'releasePublishedDate': releasePublishedDate,
+    };
+  }
 }
