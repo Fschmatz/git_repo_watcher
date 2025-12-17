@@ -13,9 +13,14 @@ import '../service/repository_service.dart';
 class RepositoryTile extends StatefulWidget {
   final Repository repository;
   final Function refreshList;
-  final bool refreshAllRepositories;
+  final bool hasNewVersion;
 
-  const RepositoryTile({Key? key, required this.repository, required this.refreshList, required this.refreshAllRepositories}) : super(key: key);
+  const RepositoryTile({
+    Key? key,
+    required this.repository,
+    required this.refreshList,
+    this.hasNewVersion = false,
+  }) : super(key: key);
 
   @override
   State<RepositoryTile> createState() => _RepositoryTileState();
@@ -25,20 +30,12 @@ class _RepositoryTileState extends State<RepositoryTile> {
   late Repository _repository;
   bool _loadingData = false;
   List<String> _formattedRepositoryData = [];
-  bool _newVersion = false;
-  String _previousReleasePublishedDate = '';
 
   @override
   void initState() {
+    super.initState();
     _formattedRepositoryData = widget.repository.link!.split('/');
     _repository = widget.repository;
-    _previousReleasePublishedDate = widget.repository.releasePublishedDate!;
-
-    if (widget.refreshAllRepositories) {
-      getRepositoryData();
-    }
-
-    super.initState();
   }
 
   Future<void> getRepositoryData() async {
@@ -46,33 +43,35 @@ class _RepositoryTileState extends State<RepositoryTile> {
       _loadingData = true;
     });
 
-    //REPO
-    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}"));
+    try {
+      final responseRepo = await http.get(
+        Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}"),
+      );
 
-    //RELEASE
-    final responseRelease = await http.get(
-      Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}/releases/latest"),
-    );
+      final responseLatestRelease = await http.get(
+        Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}/releases/latest"),
+      );
 
-    if (responseRepo.statusCode == 200) {
-      _repository = Repository.fromJSON(jsonDecode(responseRepo.body));
-      Release release = Release.fromJSON(jsonDecode(responseRelease.body));
-      _repository.releaseLink = release.link;
-      _repository.releaseVersion = release.version;
-      _repository.releasePublishedDate = release.publishedDate;
-      _repository.id = widget.repository.id;
-      _repository.note = widget.repository.note;
+      if (responseRepo.statusCode == 200 && responseLatestRelease.statusCode == 200) {
+        _repository = Repository.fromJSON(jsonDecode(responseRepo.body));
+        Release release = Release.fromJSON(jsonDecode(responseLatestRelease.body));
+        _repository.releaseLink = release.link;
+        _repository.releaseVersion = release.version;
+        _repository.releasePublishedDate = release.publishedDate;
+        _repository.id = widget.repository.id;
+        _repository.note = widget.repository.note;
 
-      await _update();
-      widget.repository.releaseLink = _repository.releaseLink;
+        await _update();
+        widget.refreshList();
 
-      showNewReleaseIcon();
-    } else if (responseRepo.statusCode == 403) {
-      Fluttertoast.showToast(msg: "API Limit");
-    } else if (responseRepo.statusCode == 404) {
-      Fluttertoast.showToast(msg: "Error Loading");
-    } else {
-      Fluttertoast.showToast(msg: "Error Loading");
+        Fluttertoast.showToast(msg: "Updated ${_repository.name}");
+      } else if (responseRepo.statusCode == 403) {
+        Fluttertoast.showToast(msg: "API Limit Reached");
+      } else {
+        Fluttertoast.showToast(msg: "Error Loading");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
     }
 
     setState(() {
@@ -86,16 +85,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
 
   Future<void> _delete() async {
     await RepositoryService().delete(_repository);
-  }
-
-  void showNewReleaseIcon() {
-    if (_previousReleasePublishedDate.isNotEmpty && _repository.releasePublishedDate != null && _repository.releasePublishedDate!.isNotEmpty) {
-      if (_previousReleasePublishedDate != _repository.releasePublishedDate) {
-        setState(() {
-          _newVersion = !_newVersion;
-        });
-      }
-    }
   }
 
   _launchPage(String url) {
@@ -121,22 +110,27 @@ class _RepositoryTileState extends State<RepositoryTile> {
                 title: Text(_repository.name!, textAlign: TextAlign.center, style: infoStyle),
               ),
               (_repository.note!.isEmpty) ? const SizedBox.shrink() : ListTile(leading: Text(_repository.note!, style: infoStyle)),
-              /* (_repository.owner == 'null')
+              (_repository.releaseVersion == 'null' || _repository.releaseVersion!.isEmpty)
                   ? const SizedBox.shrink()
                   : ListTile(
-                      leading: Text("Owner", style: infoStyle),
-                      trailing: Text(_repository.owner!, style: infoStyle),
-                    ),*/
+                      leading: Text("Version:", style: infoStyle),
+                      trailing: Text(
+                          _repository.releaseVersion!.length > 20
+                              ? '${_repository.releaseVersion!.substring(0, 20)}...'
+                              : _repository.releaseVersion!,
+                          maxLines: 1,
+                          style: infoStyle),
+                    ),
               (_repository.lastUpdate == 'null')
                   ? const SizedBox.shrink()
                   : ListTile(
-                      leading: Text("Latest update", style: infoStyle),
+                      leading: Text("Latest update:", style: infoStyle),
                       trailing: Text(getFormattedDate(_repository.lastUpdate!), style: infoStyle),
                     ),
               (_repository.releasePublishedDate == 'null')
                   ? const SizedBox.shrink()
                   : ListTile(
-                      leading: Text("Latest release", style: infoStyle),
+                      leading: Text("Latest release:", style: infoStyle),
                       trailing: Text(getFormattedDate(_repository.releasePublishedDate!), style: infoStyle),
                     ),
               const Divider(),
@@ -166,6 +160,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     _launchPage(widget.repository.releaseLink!);
                   },
                 ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.refresh_outlined),
+                title: const Text("Refresh"),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  getRepositoryData();
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.delete_outline_outlined),
@@ -208,13 +210,20 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Widget build(BuildContext context) {
     final colorscheme = Theme.of(context).colorScheme;
     String versionFormatted =
-        _repository.releaseVersion!.length > 14 ? "${_repository.releaseVersion!.substring(0, 11)}..." : _repository.releaseVersion!;
-    TextStyle titleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colorscheme.onPrimaryContainer);
-    TextStyle subtitleStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colorscheme.onSecondaryContainer);
+        _repository.releaseVersion!.length > 12 ? "${_repository.releaseVersion!.substring(0, 9)}..." : _repository.releaseVersion!;
+    TextStyle titleStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: colorscheme.onPrimaryContainer,
+    );
+    TextStyle subtitleStyle = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: colorscheme.onSecondaryContainer,
+    );
 
     return InkWell(
       onTap: openBottomMenu,
-      onLongPress: getRepositoryData,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
         child: Column(
@@ -235,20 +244,30 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        _newVersion ? Icon(Icons.new_releases_outlined, color: colorscheme.onTertiaryContainer) : const SizedBox.shrink(),
+                        widget.hasNewVersion ? Icon(Icons.new_releases_outlined, color: colorscheme.onTertiaryContainer) : const SizedBox.shrink(),
                         const SizedBox(width: 10),
                         _loadingData
                             ? const Padding(
                                 padding: EdgeInsets.only(right: 20.0),
-                                child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2.0)),
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2.0),
+                                ),
                               )
                             : Visibility(
                                 visible: _repository.releasePublishedDate != 'null',
                                 child: Chip(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                   label: Text(versionFormatted),
                                   side: const BorderSide(color: Colors.transparent),
-                                  labelStyle: TextStyle(fontSize: 12, color: colorscheme.onTertiaryContainer, fontWeight: FontWeight.w600),
+                                  labelStyle: TextStyle(
+                                    fontSize: 12,
+                                    color: colorscheme.onTertiaryContainer,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                   backgroundColor: colorscheme.tertiaryContainer,
                                 ),
                               ),
