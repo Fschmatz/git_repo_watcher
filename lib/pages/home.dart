@@ -5,10 +5,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/pages/new_repository.dart';
 import 'package:git_repo_watcher/pages/settings/settings_page.dart';
+import 'package:git_repo_watcher/service/github_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
 import 'package:git_repo_watcher/util/app_details.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
-import 'package:http/http.dart' as http;
 
 import '../classes/release.dart';
 
@@ -28,6 +28,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
     getAllSavedRepositories();
   }
 
@@ -55,9 +56,7 @@ class _HomeState extends State<Home> {
       List<String> formattedData = repo.link!.split('/');
 
       try {
-        final responseRepo = await http.get(
-          Uri.parse("https://api.github.com/repos/${formattedData[3]}/${formattedData[4]}"),
-        );
+        final responseRepo = await GitHubService().getRepositoryData(formattedData);
 
         if (responseRepo.statusCode == 403) {
           Fluttertoast.showToast(msg: "API Limit Reached");
@@ -69,9 +68,7 @@ class _HomeState extends State<Home> {
           continue;
         }
 
-        final responseLatestRelease = await http.get(
-          Uri.parse("https://api.github.com/repos/${formattedData[3]}/${formattedData[4]}/releases/latest"),
-        );
+        final responseLatestRelease = await GitHubService().getRepositoryLatestReleaseData(formattedData);
 
         if (responseLatestRelease.statusCode == 403) {
           Fluttertoast.showToast(msg: "API Limit Reached");
@@ -129,7 +126,7 @@ class _HomeState extends State<Home> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2.0, color: Colors.white),
+                    child: CircularProgressIndicator(strokeWidth: 2.0),
                   )
                 : const Icon(Icons.refresh_outlined),
             onPressed: _refreshing ? null : refreshAllRepositories,

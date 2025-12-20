@@ -1,5 +1,5 @@
 class AppDetails {
-  static String appVersion = "1.6.1";
+  static String appVersion = "1.6.2";
   static String appName = "Git Repo Watcher Fschmatz";
   static String appNameHomePage = "Git Repo Watcher";
   static String backupFileName = "git_repo_watcher_backup";
@@ -8,6 +8,7 @@ class AppDetails {
   static String changelogCurrent = '''
 $appVersion
 - UI changes
+- Added GitHub token
 - Bug fixes
 - Create backup
 - Restore from backup

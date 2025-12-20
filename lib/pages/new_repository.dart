@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 
 import '../../db/repository_dao.dart';
 import '../classes/release.dart';
 import '../classes/repository.dart';
+import '../service/github_service.dart';
 
 class NewRepository extends StatefulWidget {
   final Function refreshList;
@@ -28,14 +28,8 @@ class _NewRepositoryState extends State<NewRepository> {
 
   Future<void> getRepositoryDataAndSave() async {
     List<String> formattedRepositoryData = controllerRepoLink.text.split('/');
-
-    //REPO
-    final responseRepo = await http.get(Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}"));
-
-    //RELEASE
-    final responseRelease = await http.get(
-      Uri.parse("https://api.github.com/repos/${formattedRepositoryData[3]}/${formattedRepositoryData[4]}/releases/latest"),
-    );
+    final responseRepo = await GitHubService().getRepositoryData(formattedRepositoryData);
+    final responseRelease = await GitHubService().getRepositoryLatestReleaseData(formattedRepositoryData);
 
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
@@ -64,7 +58,8 @@ class _NewRepositoryState extends State<NewRepository> {
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
       RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
     };
-    final id = await _repositories.insert(row);
+
+    await _repositories.insert(row);
   }
 
   bool validateTextFields() {

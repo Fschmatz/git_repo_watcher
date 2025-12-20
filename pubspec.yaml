@@ -1,7 +1,7 @@
 name: git_repo_watcher
 description: Flutter project.
 publish_to: 'none'
-version: 1.6.1
+version: 1.6.2
 
 environment:
   sdk: '>=3.2.6 <4.0.0'

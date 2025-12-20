@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
-import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../classes/release.dart';
+import '../service/github_service.dart';
 import '../service/repository_service.dart';
 
 class RepositoryTile extends StatefulWidget {
@@ -44,13 +44,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
     });
 
     try {
-      final responseRepo = await http.get(
-        Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}"),
-      );
-
-      final responseLatestRelease = await http.get(
-        Uri.parse("https://api.github.com/repos/${_formattedRepositoryData[3]}/${_formattedRepositoryData[4]}/releases/latest"),
-      );
+      final responseRepo = await GitHubService().getRepositoryData(_formattedRepositoryData);
+      final responseLatestRelease = await GitHubService().getRepositoryLatestReleaseData(_formattedRepositoryData);
 
       if (responseRepo.statusCode == 200 && responseLatestRelease.statusCode == 200) {
         _repository = Repository.fromJSON(jsonDecode(responseRepo.body));
@@ -115,8 +110,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   : ListTile(
                       leading: Text("Version:", style: infoStyle),
                       trailing: Text(
-                          _repository.releaseVersion!.length > 20
-                              ? '${_repository.releaseVersion!.substring(0, 20)}...'
+                          _repository.releaseVersion!.length > 18
+                              ? '${_repository.releaseVersion!.substring(0, 18)}...'
                               : _repository.releaseVersion!,
                           maxLines: 1,
                           style: infoStyle),
@@ -136,25 +131,25 @@ class _RepositoryTileState extends State<RepositoryTile> {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.open_in_new_outlined),
-                title: Text("View repository", style: infoStyle),
+                title: Text("Repository", style: infoStyle),
                 onTap: () {
                   Navigator.of(context).pop();
                   _launchPage(widget.repository.link!);
                 },
               ),
-              ListTile(
+              /*    ListTile(
                 leading: const Icon(Icons.open_in_new_outlined),
-                title: const Text("View default branch commits"),
+                title: const Text("Default branch commits"),
                 onTap: () {
                   Navigator.of(context).pop();
                   _launchPage("${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
                 },
-              ),
+              ),*/
               Visibility(
                 visible: _repository.releasePublishedDate! != 'null',
                 child: ListTile(
                   leading: const Icon(Icons.open_in_new_outlined),
-                  title: const Text("View latest release"),
+                  title: const Text("Latest release"),
                   onTap: () {
                     Navigator.of(context).pop();
                     _launchPage(widget.repository.releaseLink!);
