@@ -111,7 +111,8 @@ class _HomeState extends State<Home> {
     });
 
     if (!hitRateLimit) {
-      Fluttertoast.showToast(msg: "Refresh Complete");
+      Fluttertoast.showToast(
+          msg: "Refresh Complete${_repositoriesWithNewVersions.isNotEmpty ? ": ${_repositoriesWithNewVersions.length} New Release(s)" : ""}");
     }
   }
 
@@ -124,9 +125,9 @@ class _HomeState extends State<Home> {
           IconButton(
             icon: _refreshing
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2.0),
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(),
                   )
                 : const Icon(Icons.refresh_outlined),
             onPressed: _refreshing ? null : refreshAllRepositories,
