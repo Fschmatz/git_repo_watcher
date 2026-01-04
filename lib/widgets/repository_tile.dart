@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:git_repo_watcher/util/utils_date.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../classes/release.dart';
@@ -82,13 +82,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
     await RepositoryService().delete(_repository);
   }
 
-  _launchPage(String url) {
+  void _launchPage(String url) {
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
-  String getFormattedDate(String date) {
+/*  String getFormattedDate(String date) {
     return Jiffy.parse(date).format(pattern: 'dd/MM/yyyy');
-  }
+  }*/
 
   void openBottomMenu() {
     TextStyle infoStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
@@ -120,13 +120,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   ? const SizedBox.shrink()
                   : ListTile(
                       leading: Text("Latest update:", style: infoStyle),
-                      trailing: Text(getFormattedDate(_repository.lastUpdate!), style: infoStyle),
+                      trailing: Text(UtilsDate.format(_repository.lastUpdate!), style: infoStyle),
                     ),
               (_repository.releasePublishedDate == 'null')
                   ? const SizedBox.shrink()
                   : ListTile(
                       leading: Text("Latest release:", style: infoStyle),
-                      trailing: Text(getFormattedDate(_repository.releasePublishedDate!), style: infoStyle),
+                      trailing: Text(UtilsDate.format(_repository.releasePublishedDate!), style: infoStyle),
                     ),
               const Divider(),
               ListTile(
@@ -179,7 +179,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
     );
   }
 
-  showAlertDialogOkDelete(BuildContext context) {
+  void showAlertDialogOkDelete(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
