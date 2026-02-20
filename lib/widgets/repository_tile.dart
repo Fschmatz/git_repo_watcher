@@ -14,13 +14,15 @@ class RepositoryTile extends StatefulWidget {
   final Repository repository;
   final Function refreshList;
   final bool hasNewVersion;
+  final VoidCallback? onNewVersionDetected;
 
   const RepositoryTile({
-    Key? key,
+    super.key,
     required this.repository,
     required this.refreshList,
     this.hasNewVersion = false,
-  }) : super(key: key);
+    this.onNewVersionDetected,
+  });
 
   @override
   State<RepositoryTile> createState() => _RepositoryTileState();
@@ -34,8 +36,20 @@ class _RepositoryTileState extends State<RepositoryTile> {
   @override
   void initState() {
     super.initState();
+
     _formattedRepositoryData = widget.repository.link!.split('/');
     _repository = widget.repository;
+  }
+
+  @override
+  void didUpdateWidget(covariant RepositoryTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.repository != widget.repository) {
+      setState(() {
+        _repository = widget.repository;
+      });
+    }
   }
 
   Future<void> getRepositoryData() async {
@@ -48,6 +62,8 @@ class _RepositoryTileState extends State<RepositoryTile> {
       final responseLatestRelease = await GitHubService().getRepositoryLatestReleaseData(_formattedRepositoryData);
 
       if (responseRepo.statusCode == 200 && responseLatestRelease.statusCode == 200) {
+        String? oldDate = widget.repository.releasePublishedDate;
+
         _repository = Repository.fromJSON(jsonDecode(responseRepo.body));
         Release release = Release.fromJSON(jsonDecode(responseLatestRelease.body));
         _repository.releaseLink = release.link;
@@ -55,6 +71,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
         _repository.releasePublishedDate = release.publishedDate;
         _repository.id = widget.repository.id;
         _repository.note = widget.repository.note;
+
+        if (oldDate != null && oldDate.isNotEmpty && oldDate != 'null' && _repository.releasePublishedDate != oldDate) {
+          widget.onNewVersionDetected?.call();
+        }
 
         await _update();
         widget.refreshList();
@@ -207,8 +227,6 @@ class _RepositoryTileState extends State<RepositoryTile> {
     String versionFormatted =
         _repository.releaseVersion!.length > 12 ? "${_repository.releaseVersion!.substring(0, 9)}..." : _repository.releaseVersion!;
     TextStyle titleStyle = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
       color: colorscheme.onPrimaryContainer,
     );
     TextStyle subtitleStyle = TextStyle(

@@ -179,6 +179,11 @@ class _HomeState extends State<Home> {
                         refreshList: getAllSavedRepositories,
                         repository: repo,
                         hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
+                        onNewVersionDetected: () {
+                          setState(() {
+                            _repositoriesWithNewVersions.add(repo.id!);
+                          });
+                        },
                       );
                     },
                   ),
