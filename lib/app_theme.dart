@@ -1,11 +1,23 @@
 import 'package:dynamic_system_colors/dynamic_system_colors.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:git_repo_watcher/pages/home.dart';
 
-import 'app.dart';
+class AppTheme extends StatefulWidget {
+  const AppTheme({super.key});
 
-class AppTheme extends StatelessWidget {
-  const AppTheme({Key? key}) : super(key: key);
+  @override
+  State<AppTheme> createState() => _AppThemeState();
+}
+
+class _AppThemeState extends State<AppTheme> {
+  @override
+  void initState() {
+    super.initState();
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +33,7 @@ class AppTheme extends StatelessWidget {
             useMaterial3: true,
           ),
           themeMode: EasyDynamicTheme.of(context).themeMode,
-          home: const App());
+          home: const Home());
     });
   }
 }

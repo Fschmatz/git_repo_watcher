@@ -225,10 +225,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   Widget build(BuildContext context) {
     final colorscheme = Theme.of(context).colorScheme;
     String versionFormatted =
-        _repository.releaseVersion!.length > 12 ? "${_repository.releaseVersion!.substring(0, 9)}..." : _repository.releaseVersion!;
-    TextStyle titleStyle = TextStyle(
-      color: colorscheme.onPrimaryContainer,
-    );
+        _repository.releaseVersion!.length > 10 ? "${_repository.releaseVersion!.substring(0, 8)}..." : _repository.releaseVersion!;
     TextStyle subtitleStyle = TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w600,
@@ -246,7 +243,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
                 Expanded(
                   flex: 3,
                   child: ListTile(
-                    title: Text(_repository.name!, style: titleStyle),
+                    title: Text(
+                      _repository.name!,
+                    ),
                     subtitle: Text(_repository.owner!, style: subtitleStyle),
                   ),
                 ),
@@ -257,7 +256,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        widget.hasNewVersion ? Icon(Icons.new_releases_outlined, color: colorscheme.onTertiaryContainer) : const SizedBox.shrink(),
+                        widget.hasNewVersion ? Icon(Icons.new_releases_outlined, color: colorscheme.tertiaryContainer) : const SizedBox.shrink(),
                         const SizedBox(width: 10),
                         _loadingData
                             ? const Padding(
@@ -278,10 +277,10 @@ class _RepositoryTileState extends State<RepositoryTile> {
                                   side: const BorderSide(color: Colors.transparent),
                                   labelStyle: TextStyle(
                                     fontSize: 12,
-                                    color: colorscheme.onTertiaryContainer,
+                                    color: colorscheme.onSecondaryContainer,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  backgroundColor: colorscheme.tertiaryContainer,
+                                  backgroundColor: colorscheme.secondaryContainer,
                                 ),
                               ),
                       ],
