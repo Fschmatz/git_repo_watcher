@@ -36,13 +36,14 @@ class _DialogBackupState extends State<DialogBackup> {
           child: const Text(
             "Yes",
           ),
-          onPressed: () {
+          onPressed: () async {
             if (widget.isCreateBackup) {
               Navigator.of(context).pop();
               _createBackup();
             } else {
               Navigator.of(context).pop();
-              _restoreFromBackup();
+              await _restoreFromBackup();
+              widget.refreshList();
             }
           },
         )

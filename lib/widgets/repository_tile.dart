@@ -106,93 +106,105 @@ class _RepositoryTileState extends State<RepositoryTile> {
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
-/*  String getFormattedDate(String date) {
-    return Jiffy.parse(date).format(pattern: 'dd/MM/yyyy');
-  }*/
-
   void openBottomMenu() {
-    TextStyle infoStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
-
     showModalBottomSheet(
       isScrollControlled: true,
       showDragHandle: true,
       context: context,
       builder: (BuildContext bc) {
         return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                title: Text(_repository.name!, textAlign: TextAlign.center, style: infoStyle),
-              ),
-              (_repository.note!.isEmpty) ? const SizedBox.shrink() : ListTile(leading: Text(_repository.note!, style: infoStyle)),
-              (_repository.releaseVersion == 'null' || _repository.releaseVersion!.isEmpty)
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text("Version:", style: infoStyle),
-                      trailing: Text(
-                          _repository.releaseVersion!.length > 18
-                              ? '${_repository.releaseVersion!.substring(0, 18)}...'
-                              : _repository.releaseVersion!,
-                          maxLines: 1,
-                          style: infoStyle),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            child: Wrap(
+              children: <Widget>[
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      _repository.name!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-              (_repository.lastUpdate == 'null')
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text("Latest update:", style: infoStyle),
-                      trailing: Text(UtilsDate.format(_repository.lastUpdate!), style: infoStyle),
-                    ),
-              (_repository.releasePublishedDate == 'null')
-                  ? const SizedBox.shrink()
-                  : ListTile(
-                      leading: Text("Latest release:", style: infoStyle),
-                      trailing: Text(UtilsDate.format(_repository.releasePublishedDate!), style: infoStyle),
-                    ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.open_in_new_outlined),
-                title: Text("Repository", style: infoStyle),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _launchPage(widget.repository.link!);
-                },
-              ),
-              /*    ListTile(
-                leading: const Icon(Icons.open_in_new_outlined),
-                title: const Text("Default branch commits"),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _launchPage("${widget.repository.link!}/commits/${widget.repository.defaultBranch!}");
-                },
-              ),*/
-              Visibility(
-                visible: _repository.releasePublishedDate! != 'null',
-                child: ListTile(
-                  leading: const Icon(Icons.open_in_new_outlined),
-                  title: const Text("Latest release"),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _launchPage(widget.repository.releaseLink!);
-                  },
+                  ),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.refresh_outlined),
-                title: const Text("Refresh"),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  getRepositoryData();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline_outlined),
-                title: const Text("Delete"),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  showAlertDialogOkDelete(context);
-                },
-              ),
-            ],
+                Card(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Column(
+                    children: [
+                      if (_repository.note!.isNotEmpty)
+                        ListTile(
+                          title: Text(_repository.note!),
+                        ),
+                      if (_repository.releaseVersion != 'null' && _repository.releaseVersion!.isNotEmpty)
+                        ListTile(
+                          title: const Text("Version"),
+                          trailing: Text(
+                            _repository.releaseVersion!.length > 18
+                                ? '${_repository.releaseVersion!.substring(0, 18)}...'
+                                : _repository.releaseVersion!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      if (_repository.lastUpdate != 'null')
+                        ListTile(
+                          title: const Text("Latest update"),
+                          trailing: Text(
+                            UtilsDate.format(_repository.lastUpdate!),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      if (_repository.releasePublishedDate != 'null')
+                        ListTile(
+                          title: const Text("Latest release"),
+                          trailing: Text(
+                            UtilsDate.format(_repository.releasePublishedDate!),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24, width: double.infinity),
+                Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.open_in_new_outlined),
+                      title: const Text("Repository"),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _launchPage(widget.repository.link!);
+                      },
+                    ),
+                    if (_repository.releasePublishedDate != 'null') ...[
+                      ListTile(
+                        leading: const Icon(Icons.new_releases_outlined),
+                        title: const Text("Latest release"),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _launchPage(widget.repository.releaseLink!);
+                        },
+                      ),
+                    ],
+                    ListTile(
+                      leading: const Icon(Icons.refresh_outlined),
+                      title: const Text("Refresh"),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        getRepositoryData();
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.delete_outline_outlined),
+                      title: Text("Delete"),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showAlertDialogOkDelete(context);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -232,64 +244,71 @@ class _RepositoryTileState extends State<RepositoryTile> {
       color: colorscheme.onSecondaryContainer,
     );
 
-    return InkWell(
-      onTap: openBottomMenu,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: ListTile(
-                    title: Text(
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: openBottomMenu,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       _repository.name!,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorscheme.onSurface,
+                      ),
                     ),
-                    subtitle: Text(_repository.owner!, style: subtitleStyle),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _repository.owner!,
+                      style: subtitleStyle,
+                    ),
+                  ],
                 ),
-                Flexible(
-                  flex: 2,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        widget.hasNewVersion ? Icon(Icons.new_releases_outlined, color: colorscheme.tertiaryContainer) : const SizedBox.shrink(),
-                        const SizedBox(width: 10),
-                        _loadingData
-                            ? const Padding(
-                                padding: EdgeInsets.only(right: 20.0),
-                                child: SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2.0),
-                                ),
-                              )
-                            : Visibility(
-                                visible: _repository.releasePublishedDate != 'null',
-                                child: Chip(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  label: Text(versionFormatted),
-                                  side: const BorderSide(color: Colors.transparent),
-                                  labelStyle: TextStyle(
-                                    fontSize: 12,
-                                    color: colorscheme.onSecondaryContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  backgroundColor: colorscheme.secondaryContainer,
-                                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (widget.hasNewVersion) Icon(Icons.new_releases_rounded, color: colorscheme.primary, size: 28),
+                  if (widget.hasNewVersion) const SizedBox(width: 8),
+                  _loadingData
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
+                      : Visibility(
+                          visible: _repository.releasePublishedDate != 'null',
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: colorscheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              versionFormatted,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: colorscheme.onSecondaryContainer,
+                                fontWeight: FontWeight.bold,
                               ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

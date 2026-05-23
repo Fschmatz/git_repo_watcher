@@ -1,5 +1,5 @@
 class AppDetails {
-  static String appVersion = "1.6.6";
+  static String appVersion = "1.7.0";
   static String appName = "Git Repo Watcher Fschmatz";
   static String appNameHomePage = "Git Repo Watcher";
   static String backupFileName = "git_repo_watcher_backup";
@@ -7,15 +7,21 @@ class AppDetails {
 
   static String changelogCurrent = '''
 $appVersion
+- Material Expressive Design
+- Add notifications
+- UI changes
+- Bug fixes
+''';
+
+  static String changelogsOld = '''
+1.6.6
 - UI changes
 - Added GitHub token
 - Bug fixes
 - Create backup
 - Restore from backup
 - Update Flutter 3.38
-''';
 
-  static String changelogsOld = '''
 1.5.0
 - Monet
 - Bug fixes

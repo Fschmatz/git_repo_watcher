@@ -92,7 +92,11 @@ class _NewRepositoryState extends State<NewRepository> {
                 labelText: "Link",
                 helperText: "* Required",
                 counterText: "",
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
                 errorText: (_validLink) ? null : "Link is empty",
               ),
             ),
@@ -107,12 +111,24 @@ class _NewRepositoryState extends State<NewRepository> {
               textCapitalization: TextCapitalization.sentences,
               keyboardType: TextInputType.name,
               controller: controllerRepoNote,
-              decoration: const InputDecoration(labelText: "Note", counterText: "", border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: "Note",
+                counterText: "",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
             child: FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              ),
               onPressed: () async {
                 if (validateTextFields()) {
                   getRepositoryDataAndSave().then((v) => Navigator.of(context).pop());

@@ -1,16 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/pages/new_repository.dart';
-import 'package:git_repo_watcher/pages/settings/settings_page.dart';
-import 'package:git_repo_watcher/service/github_service.dart';
+import 'package:git_repo_watcher/pages/settings.dart';
+import 'package:git_repo_watcher/service/background_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
 import 'package:git_repo_watcher/util/app_details.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
-
-import '../classes/release.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:workmanager/workmanager.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -29,6 +27,8 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
 
+    Permission.notification.request();
+
     getAllSavedRepositories();
   }
 
@@ -41,79 +41,26 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> refreshAllRepositories() async {
+    // Evita múltiplas chamadas simultâneas
     if (_refreshing) return;
 
     setState(() {
       _refreshing = true;
     });
 
-    bool hitRateLimit = false;
+    // Registra a tarefa única que rodará no background
+    await Workmanager().registerOneOffTask(
+      BackgroundService.taskName,
+      BackgroundService.taskName,
+    );
 
-    for (int i = 0; i < _repositoriesList.length; i++) {
-      if (hitRateLimit) break;
-
-      Repository repo = _repositoriesList[i];
-      List<String> formattedData = repo.link!.split('/');
-
-      try {
-        final responseRepo = await GitHubService().getRepositoryData(formattedData);
-
-        if (responseRepo.statusCode == 403) {
-          Fluttertoast.showToast(msg: "API Limit Reached");
-          hitRateLimit = true;
-          break;
-        }
-
-        if (responseRepo.statusCode != 200) {
-          continue;
-        }
-
-        final responseLatestRelease = await GitHubService().getRepositoryLatestReleaseData(formattedData);
-
-        if (responseLatestRelease.statusCode == 403) {
-          Fluttertoast.showToast(msg: "API Limit Reached");
-          hitRateLimit = true;
-          break;
-        }
-
-        if (responseLatestRelease.statusCode == 200) {
-          Repository updatedRepo = Repository.fromJSON(jsonDecode(responseRepo.body));
-          Release release = Release.fromJSON(jsonDecode(responseLatestRelease.body));
-
-          updatedRepo.releaseLink = release.link;
-          updatedRepo.releaseVersion = release.version;
-          updatedRepo.releasePublishedDate = release.publishedDate;
-          updatedRepo.id = repo.id;
-          updatedRepo.note = repo.note;
-
-          if (repo.releasePublishedDate != null &&
-              repo.releasePublishedDate!.isNotEmpty &&
-              repo.releasePublishedDate != 'null' &&
-              updatedRepo.releasePublishedDate != repo.releasePublishedDate) {
-            _repositoriesWithNewVersions.add(repo.id!);
-          }
-
-          await RepositoryService().update(updatedRepo);
-
-          _repositoriesList[i] = updatedRepo;
-        }
-
-        await Future.delayed(const Duration(milliseconds: 100));
-      } catch (e) {
-        continue;
-      }
+    if (mounted) {
+      setState(() {
+        _refreshing = false;
+      });
     }
 
-    await getAllSavedRepositories();
-
-    setState(() {
-      _refreshing = false;
-    });
-
-    if (!hitRateLimit) {
-      Fluttertoast.showToast(
-          msg: "Refresh Complete${_repositoriesWithNewVersions.isNotEmpty ? ": ${_repositoriesWithNewVersions.length} New Release(s)" : ""}");
-    }
+    Fluttertoast.showToast(msg: "Refresh started.");
   }
 
   @override
@@ -133,10 +80,33 @@ class _HomeState extends State<Home> {
             onPressed: _refreshing ? null : refreshAllRepositories,
           ),
           PopupMenuButton<int>(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             icon: const Icon(Icons.more_vert_outlined),
             itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-              const PopupMenuItem<int>(value: 0, child: Text('Add')),
-              const PopupMenuItem<int>(value: 1, child: Text('Settings')),
+              PopupMenuItem<int>(
+                value: 0,
+                child: Row(
+                  children: const [
+                    Icon(Icons.add_outlined),
+                    SizedBox(width: 12),
+                    Text('Add'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: Row(
+                  children: const [
+                    Icon(Icons.settings_outlined),
+                    SizedBox(width: 12),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
             ],
             onSelected: (int value) {
               switch (value) {
@@ -151,7 +121,7 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => SettingsPage(refreshList: getAllSavedRepositories),
+                      builder: (BuildContext context) => Settings(refreshList: getAllSavedRepositories),
                     ),
                   );
               }
@@ -167,7 +137,8 @@ class _HomeState extends State<Home> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   ListView.separated(
-                    separatorBuilder: (BuildContext context, int index) => const Divider(height: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: _repositoriesList.length,
