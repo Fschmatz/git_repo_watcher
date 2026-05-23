@@ -8,7 +8,7 @@ import 'package:git_repo_watcher/service/repository_service.dart';
 import 'package:git_repo_watcher/util/app_details.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -17,7 +17,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   List<Repository> _repositoriesList = [];
   bool _loading = true;
   bool _refreshing = false;
@@ -26,18 +26,39 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     Permission.notification.request();
 
     getAllSavedRepositories();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      getAllSavedRepositories();
+    }
+  }
+
   Future<void> getAllSavedRepositories() async {
     _repositoriesList = await RepositoryService().queryAllAndConvertToList();
 
-    setState(() {
-      _loading = false;
-    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+
+    if (mounted) {
+      setState(() {
+        _repositoriesWithNewVersions.addAll(savedIds.map((e) => int.parse(e)));
+        _loading = false;
+      });
+    }
   }
 
   Future<void> refreshAllRepositories() async {
@@ -48,19 +69,30 @@ class _HomeState extends State<Home> {
       _refreshing = true;
     });
 
-    // Registra a tarefa única que rodará no background
-    await Workmanager().registerOneOffTask(
-      BackgroundService.taskName,
-      BackgroundService.taskName,
-    );
+    Fluttertoast.showToast(msg: "Refreshing...");
+
+    final result = await BackgroundService.runRefreshTask();
 
     if (mounted) {
       setState(() {
         _refreshing = false;
+        _repositoriesWithNewVersions.addAll(result.updatedIds);
       });
-    }
 
-    Fluttertoast.showToast(msg: "Refresh started.");
+      if (result.hitRateLimit) {
+        Fluttertoast.showToast(msg: "API Rate limit reached");
+      }
+
+      getAllSavedRepositories();
+    }
+  }
+
+  Future<void> _markAllAsRead() async {
+    setState(() {
+      _repositoriesWithNewVersions.clear();
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('updated_repo_ids', []);
   }
 
   @override
@@ -70,13 +102,7 @@ class _HomeState extends State<Home> {
         title: Text(AppDetails.appNameHomePage),
         actions: [
           IconButton(
-            icon: _refreshing
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(),
-                  )
-                : const Icon(Icons.refresh_outlined),
+            icon: const Icon(Icons.refresh_outlined),
             onPressed: _refreshing ? null : refreshAllRepositories,
           ),
           PopupMenuButton<int>(
@@ -101,6 +127,16 @@ class _HomeState extends State<Home> {
                 value: 1,
                 child: Row(
                   children: const [
+                    Icon(Icons.done_all_outlined),
+                    SizedBox(width: 12),
+                    Text('Mark all as viewed'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 2,
+                child: Row(
+                  children: const [
                     Icon(Icons.settings_outlined),
                     SizedBox(width: 12),
                     Text('Settings'),
@@ -118,6 +154,8 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 case 1:
+                  _markAllAsRead();
+                case 2:
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -150,10 +188,32 @@ class _HomeState extends State<Home> {
                         refreshList: getAllSavedRepositories,
                         repository: repo,
                         hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
-                        onNewVersionDetected: () {
+                        onNewVersionDetected: () async {
                           setState(() {
                             _repositoriesWithNewVersions.add(repo.id!);
                           });
+
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.reload();
+                          List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+                          if (!savedIds.contains(repo.id!.toString())) {
+                            savedIds.add(repo.id!.toString());
+                            await prefs.setStringList('updated_repo_ids', savedIds);
+                          }
+                        },
+                        onVersionViewed: () async {
+                          setState(() {
+                            _repositoriesWithNewVersions.remove(repo.id!);
+                          });
+
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.reload();
+                          List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+
+                          if (savedIds.contains(repo.id!.toString())) {
+                            savedIds.remove(repo.id!.toString());
+                            await prefs.setStringList('updated_repo_ids', savedIds);
+                          }
                         },
                       );
                     },

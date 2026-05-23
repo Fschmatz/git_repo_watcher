@@ -5,6 +5,7 @@ import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/service/github_service.dart';
 import 'package:git_repo_watcher/service/notification_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BackgroundService {
   static const String taskName = 'manual_refresh_task';
@@ -28,13 +29,16 @@ class BackgroundService {
 
       try {
         final responseRepo = await GitHubService().getRepositoryData(formattedData);
+
         if (responseRepo.statusCode == 403) {
           hitRateLimit = true;
           break;
         }
+
         if (responseRepo.statusCode != 200) continue;
 
         final responseLatestRelease = await GitHubService().getRepositoryLatestReleaseData(formattedData);
+
         if (responseLatestRelease.statusCode == 403) {
           hitRateLimit = true;
           break;
@@ -56,6 +60,7 @@ class BackgroundService {
               updatedRepo.releasePublishedDate != repo.releasePublishedDate) {
             updatedIds.add(repo.id!);
           }
+
           await RepositoryService().update(updatedRepo);
         }
       } catch (e) {
@@ -71,6 +76,13 @@ class BackgroundService {
     await NotificationService().flutterLocalNotificationsPlugin.cancel(id: 1);
 
     if (updatedIds.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
+      List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+      Set<int> allUpdatedIds = savedIds.map((e) => int.parse(e)).toSet();
+      allUpdatedIds.addAll(updatedIds);
+      await prefs.setStringList('updated_repo_ids', allUpdatedIds.map((e) => e.toString()).toList());
+
       await NotificationService().showCompletedNotification(2, 'Refresh Complete', '${updatedIds.length} new releases');
     } else {
       await NotificationService().showCompletedNotification(2, 'Refresh Complete', 'No releases');

@@ -15,6 +15,7 @@ class RepositoryTile extends StatefulWidget {
   final Function refreshList;
   final bool hasNewVersion;
   final VoidCallback? onNewVersionDetected;
+  final VoidCallback? onVersionViewed;
 
   const RepositoryTile({
     super.key,
@@ -22,6 +23,7 @@ class RepositoryTile extends StatefulWidget {
     required this.refreshList,
     this.hasNewVersion = false,
     this.onNewVersionDetected,
+    this.onVersionViewed,
   });
 
   @override
@@ -107,6 +109,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   void openBottomMenu() {
+    TextStyle styleTrailing = const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+
+    widget.onVersionViewed?.call();
     showModalBottomSheet(
       isScrollControlled: true,
       showDragHandle: true,
@@ -142,7 +147,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                             _repository.releaseVersion!.length > 18
                                 ? '${_repository.releaseVersion!.substring(0, 18)}...'
                                 : _repository.releaseVersion!,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: styleTrailing,
                           ),
                         ),
                       if (_repository.lastUpdate != 'null')
@@ -150,7 +155,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                           title: const Text("Latest update"),
                           trailing: Text(
                             UtilsDate.format(_repository.lastUpdate!),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: styleTrailing,
                           ),
                         ),
                       if (_repository.releasePublishedDate != 'null')
@@ -158,7 +163,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                           title: const Text("Latest release"),
                           trailing: Text(
                             UtilsDate.format(_repository.releasePublishedDate!),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: styleTrailing,
                           ),
                         ),
                     ],
@@ -282,10 +287,13 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   if (widget.hasNewVersion) Icon(Icons.new_releases_rounded, color: colorscheme.primary, size: 28),
                   if (widget.hasNewVersion) const SizedBox(width: 8),
                   _loadingData
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ? Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                          child: const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          ),
                         )
                       : Visibility(
                           visible: _repository.releasePublishedDate != 'null',
