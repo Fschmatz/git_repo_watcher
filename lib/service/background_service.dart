@@ -18,8 +18,10 @@ class BackgroundService {
 
     List<int> updatedIds = [];
     bool hitRateLimit = false;
+    bool networkError = false;
+    int consecutiveErrors = 0;
 
-    await NotificationService().showProgressNotification(1, 'Refreshing repositories', 'Starting refresh...', 0, repositoriesList.length);
+    await NotificationService().startForegroundProgressNotification(1, 'Refreshing repositories', 'Starting refresh...', 0, repositoriesList.length);
 
     for (int i = 0; i < repositoriesList.length; i++) {
       if (hitRateLimit) break;
@@ -62,20 +64,31 @@ class BackgroundService {
           }
 
           await RepositoryService().update(updatedRepo);
+          consecutiveErrors = 0;
         }
       } catch (e) {
+        consecutiveErrors++;
+        if (consecutiveErrors >= 3) {
+          networkError = true;
+          break;
+        }
         // Continue to the next repository if a network or parsing error occurs
         continue;
       }
 
       await NotificationService()
-          .showProgressNotification(1, 'Refreshing repositories', 'Checked ${i + 1} of ${repositoriesList.length}', i + 1, repositoriesList.length);
+          .startForegroundProgressNotification(1, 'Refreshing repositories', 'Checked ${i + 1} of ${repositoriesList.length}', i + 1, repositoriesList.length);
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
+    await NotificationService().stopForegroundService();
     await NotificationService().flutterLocalNotificationsPlugin.cancel(id: 1);
 
-    if (updatedIds.isNotEmpty) {
+    if (hitRateLimit) {
+      await NotificationService().showCompletedNotification(2, 'Refresh Stopped', 'API rate limit exceeded');
+    } else if (networkError) {
+      await NotificationService().showCompletedNotification(2, 'Refresh Interrupted', 'Network error or app suspended');
+    } else if (updatedIds.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.reload();
       List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];

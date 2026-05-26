@@ -108,105 +108,189 @@ class _RepositoryTileState extends State<RepositoryTile> {
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
-  void openBottomMenu() {
-    TextStyle styleTrailing = const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+  Widget _buildVersionCard(BuildContext context, String version) {
+    final colorscheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: colorscheme.primaryContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.sell_outlined, size: 28, color: colorscheme.onPrimaryContainer),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Version",
+                  style: TextStyle(fontSize: 13, color: colorscheme.onPrimaryContainer.withValues(alpha: 0.8)),
+                ),
+                Text(
+                  version,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorscheme.onPrimaryContainer),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildInfoChip(BuildContext context, String label, String value, IconData icon) {
+    final colorscheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colorscheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 22, color: colorscheme.onSecondaryContainer),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: colorscheme.onSecondaryContainer.withValues(alpha: 0.8)),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: colorscheme.onSecondaryContainer),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void openBottomMenu() {
     widget.onVersionViewed?.call();
     showModalBottomSheet(
       isScrollControlled: true,
       showDragHandle: true,
       context: context,
       builder: (BuildContext bc) {
+        final colorscheme = Theme.of(context).colorScheme;
+
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            child: Wrap(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                Text(
+                  _repository.name!,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                /*
+                if (_repository.owner != null && _repository.owner!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      _repository.name!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      _repository.owner!,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorscheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
+                  */
+                if (_repository.note != null && _repository.note!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Text(
+                      _repository.note!,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        color: colorscheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 24),
+                if (_repository.releaseVersion != 'null' && _repository.releaseVersion!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildVersionCard(
+                      context,
+                      _repository.releaseVersion!.length > 25 ? '${_repository.releaseVersion!.substring(0, 25)}...' : _repository.releaseVersion!,
+                    ),
+                  ),
+                Row(
+                  children: [
+                    if (_repository.releasePublishedDate != 'null')
+                      Expanded(
+                        child: _buildInfoChip(
+                          context,
+                          "Released",
+                          UtilsDate.format(_repository.releasePublishedDate!),
+                          Icons.event_available_outlined,
+                        ),
+                      ),
+                    if (_repository.releasePublishedDate != 'null' && _repository.lastUpdate != 'null') const SizedBox(width: 12),
+                    if (_repository.lastUpdate != 'null')
+                      Expanded(
+                        child: _buildInfoChip(
+                          context,
+                          "Checked",
+                          UtilsDate.format(_repository.lastUpdate!),
+                          Icons.history_outlined,
+                        ),
+                      ),
+                  ],
                 ),
-                Card(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                const SizedBox(height: 24),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorscheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     children: [
-                      if (_repository.note!.isNotEmpty)
-                        ListTile(
-                          title: Text(_repository.note!),
-                        ),
-                      if (_repository.releaseVersion != 'null' && _repository.releaseVersion!.isNotEmpty)
-                        ListTile(
-                          title: const Text("Version"),
-                          trailing: Text(
-                            _repository.releaseVersion!.length > 18
-                                ? '${_repository.releaseVersion!.substring(0, 18)}...'
-                                : _repository.releaseVersion!,
-                            style: styleTrailing,
-                          ),
-                        ),
-                      if (_repository.lastUpdate != 'null')
-                        ListTile(
-                          title: const Text("Latest update"),
-                          trailing: Text(
-                            UtilsDate.format(_repository.lastUpdate!),
-                            style: styleTrailing,
-                          ),
-                        ),
-                      if (_repository.releasePublishedDate != 'null')
-                        ListTile(
-                          title: const Text("Latest release"),
-                          trailing: Text(
-                            UtilsDate.format(_repository.releasePublishedDate!),
-                            style: styleTrailing,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24, width: double.infinity),
-                Column(
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.open_in_new_outlined),
-                      title: const Text("Repository"),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _launchPage(widget.repository.link!);
-                      },
-                    ),
-                    if (_repository.releasePublishedDate != 'null') ...[
                       ListTile(
-                        leading: const Icon(Icons.new_releases_outlined),
-                        title: const Text("Latest release"),
+                        leading: Icon(Icons.open_in_new_outlined, color: colorscheme.primary),
+                        title: const Text("Open Repository"),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
                         onTap: () {
                           Navigator.of(context).pop();
-                          _launchPage(widget.repository.releaseLink!);
+                          _launchPage(widget.repository.link!);
+                        },
+                      ),
+                      if (_repository.releasePublishedDate != 'null') ...[
+                        ListTile(
+                          leading: Icon(Icons.new_releases_outlined, color: colorscheme.primary),
+                          title: const Text("Open Latest Release"),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            _launchPage(widget.repository.releaseLink!);
+                          },
+                        ),
+                      ],
+                      ListTile(
+                        leading: Icon(Icons.refresh_outlined, color: colorscheme.primary),
+                        title: const Text("Refresh Data"),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          getRepositoryData();
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.delete_outline_outlined),
+                        title: Text("Delete"),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showAlertDialogOkDelete(context);
                         },
                       ),
                     ],
-                    ListTile(
-                      leading: const Icon(Icons.refresh_outlined),
-                      title: const Text("Refresh"),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        getRepositoryData();
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.delete_outline_outlined),
-                      title: Text("Delete"),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        showAlertDialogOkDelete(context);
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),

@@ -38,6 +38,34 @@ class NotificationService {
     );
   }
 
+  Future<void> startForegroundProgressNotification(int id, String title, String body, int progress, int maxProgress) async {
+    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'refresh_progress',
+      'Refresh Progress',
+      channelDescription: 'Shows progress of repository refresh',
+      channelShowBadge: false,
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+      onlyAlertOnce: true,
+      showProgress: true,
+      maxProgress: maxProgress,
+      progress: progress,
+      icon: 'ic_notification',
+    );
+
+    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.startForegroundService(
+          id: id,
+          title: title,
+          body: body,
+          notificationDetails: androidPlatformChannelSpecifics,
+          payload: 'refresh_in_progress',
+        );
+  }
+
+  Future<void> stopForegroundService() async {
+    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.stopForegroundService();
+  }
+
   Future<void> showCompletedNotification(int id, String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'refresh_completed',
