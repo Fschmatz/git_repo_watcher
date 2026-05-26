@@ -228,7 +228,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       Expanded(
                         child: _buildInfoChip(
                           context,
-                          "Released",
+                          "Latest Release",
                           UtilsDate.format(_repository.releasePublishedDate!),
                           Icons.event_available_outlined,
                         ),
@@ -238,7 +238,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                       Expanded(
                         child: _buildInfoChip(
                           context,
-                          "Checked",
+                          "Latest Git Update",
                           UtilsDate.format(_repository.lastUpdate!),
                           Icons.history_outlined,
                         ),
@@ -281,7 +281,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.delete_outline_outlined),
+                        leading: Icon(Icons.delete_outline_outlined, color: colorscheme.primary),
                         title: Text("Delete"),
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
                         onTap: () {

@@ -77,7 +77,8 @@ class BackgroundService {
       }
 
       await NotificationService()
-          .startForegroundProgressNotification(1, 'Refreshing repositories', 'Checked ${i + 1} of ${repositoriesList.length}', i + 1, repositoriesList.length);
+          .showProgressNotification(1, 'Refreshing repositories', 'Checked ${i + 1} of ${repositoriesList.length}', i + 1, repositoriesList.length);
+
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
@@ -91,9 +92,11 @@ class BackgroundService {
     } else if (updatedIds.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.reload();
+
       List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
       Set<int> allUpdatedIds = savedIds.map((e) => int.parse(e)).toSet();
       allUpdatedIds.addAll(updatedIds);
+
       await prefs.setStringList('updated_repo_ids', allUpdatedIds.map((e) => e.toString()).toList());
 
       await NotificationService().showCompletedNotification(2, 'Refresh Complete', '${updatedIds.length} new releases');

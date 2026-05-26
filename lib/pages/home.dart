@@ -129,7 +129,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   children: const [
                     Icon(Icons.done_all_outlined),
                     SizedBox(width: 12),
-                    Text('Mark all as viewed'),
+                    Text('Mark all as seen'),
                   ],
                 ),
               ),
