@@ -1,11 +1,16 @@
-class AppDetails {
-  static String appVersion = "1.7.3";
-  static String appName = "Git Repo Watcher Fschmatz";
-  static String appNameHomePage = "Git Repo Watcher";
-  static String backupFileName = "git_repo_watcher_backup";
-  static String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
+class AppConstants {
+  // SHARED PREFERENCES CONSTANTS
+  static const String sharedPrefsUpdatedRepoIdsKey = 'updated_repo_ids';
+  static const String sharedPrefsLastBackupDateKey = 'last_backup_date';
 
-  static String changelogCurrent = '''
+  // STRINGS
+  static const String appVersion = "1.7.4";
+  static const String appName = "Git Repo Watcher Fschmatz";
+  static const String appNameHomePage = "Git Repo Watcher";
+  static const String backupFileName = "git_repo_watcher_backup";
+  static const String repositoryLink = 'https://github.com/Fschmatz/git_repo_watcher';
+
+  static const String changelogCurrent = '''
 $appVersion
 - Material Expressive Design
 - Add refresh all notification
@@ -13,7 +18,7 @@ $appVersion
 - Bug fixes
 ''';
 
-  static String changelogsOld = '''
+  static const String changelogsOld = '''
 1.6.6
 - UI changes
 - Added GitHub token

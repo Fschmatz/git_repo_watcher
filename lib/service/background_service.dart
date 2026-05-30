@@ -5,7 +5,9 @@ import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/service/github_service.dart';
 import 'package:git_repo_watcher/service/notification_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:git_repo_watcher/util/shared_pref_util.dart';
+
+import '../util/app_constants.dart';
 
 class BackgroundService {
   static const String taskName = 'manual_refresh_task';
@@ -21,7 +23,8 @@ class BackgroundService {
     bool networkError = false;
     int consecutiveErrors = 0;
 
-    await NotificationService().startForegroundProgressNotification(1, 'Refreshing repositories', 'Starting refresh...', 0, repositoriesList.length);
+    await NotificationService().showProgressNotification(1, 'Refreshing repositories', 'Refreshing...', 0, repositoriesList.length);
+    await NotificationService().startForegroundProgressNotification(1, 'Refreshing repositories', 'Refreshing...', 0, repositoriesList.length);
 
     for (int i = 0; i < repositoriesList.length; i++) {
       if (hitRateLimit) break;
@@ -90,16 +93,15 @@ class BackgroundService {
     } else if (networkError) {
       await NotificationService().showCompletedNotification(2, 'Refresh Interrupted', 'Network error or app suspended');
     } else if (updatedIds.isNotEmpty) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.reload();
+      await SharedPrefUtil.reload();
 
-      List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+      List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
       Set<int> allUpdatedIds = savedIds.map((e) => int.parse(e)).toSet();
       allUpdatedIds.addAll(updatedIds);
 
-      await prefs.setStringList('updated_repo_ids', allUpdatedIds.map((e) => e.toString()).toList());
+      await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, allUpdatedIds.map((e) => e.toString()).toList());
 
-      await NotificationService().showCompletedNotification(2, 'Refresh Complete', '${updatedIds.length} new releases');
+      await NotificationService().showCompletedNotification(2, 'Refresh Complete', '${updatedIds.length} new release(s)');
     } else {
       await NotificationService().showCompletedNotification(2, 'Refresh Complete', 'No releases');
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'app_details.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:git_repo_watcher/util/shared_pref_util.dart';
+import 'app_constants.dart';
 import 'backup_utils.dart';
 
 class DialogBackup extends StatefulWidget {
@@ -15,11 +17,13 @@ class DialogBackup extends StatefulWidget {
 
 class _DialogBackupState extends State<DialogBackup> {
   Future<void> _createBackup() async {
-    await BackupUtils().backupData(AppDetails.backupFileName);
+    await BackupUtils().backupData(AppConstants.backupFileName);
+    String currentDate = Jiffy.now().format(pattern: 'dd/MM/yyyy');
+    await SharedPrefUtil.saveData(AppConstants.sharedPrefsLastBackupDateKey, currentDate);
   }
 
   Future<void> _restoreFromBackup() async {
-    await BackupUtils().restoreBackupData(AppDetails.backupFileName);
+    await BackupUtils().restoreBackupData(AppConstants.backupFileName);
   }
 
   @override

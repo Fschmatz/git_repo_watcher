@@ -5,10 +5,10 @@ import 'package:git_repo_watcher/pages/new_repository.dart';
 import 'package:git_repo_watcher/pages/settings.dart';
 import 'package:git_repo_watcher/service/background_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
-import 'package:git_repo_watcher/util/app_details.dart';
+import 'package:git_repo_watcher/util/app_constants.dart';
+import 'package:git_repo_watcher/util/shared_pref_util.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -21,6 +21,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   List<Repository> _repositoriesList = [];
   bool _loading = true;
   bool _refreshing = false;
+  bool _showOnlyUpdates = false;
   final Set<int> _repositoriesWithNewVersions = {};
 
   @override
@@ -49,9 +50,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   Future<void> getAllSavedRepositories() async {
     _repositoriesList = await RepositoryService().queryAllAndConvertToList();
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
+    await SharedPrefUtil.reload();
+    List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
 
     if (mounted) {
       setState(() {
@@ -91,15 +91,19 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     setState(() {
       _repositoriesWithNewVersions.clear();
     });
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('updated_repo_ids', []);
+    await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, <String>[]);
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorscheme = Theme.of(context).colorScheme;
+
+    List<Repository> displayedList =
+        _showOnlyUpdates ? _repositoriesList.where((repo) => _repositoriesWithNewVersions.contains(repo.id)).toList() : _repositoriesList;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppDetails.appNameHomePage),
+        title: Text(AppConstants.appNameHomePage),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_outlined),
@@ -174,50 +178,107 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             : ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: _repositoriesList.length,
-                    itemBuilder: (context, index) {
-                      Repository repo = _repositoriesList[index];
-
-                      return RepositoryTile(
-                        key: ValueKey(repo.id),
-                        refreshList: getAllSavedRepositories,
-                        repository: repo,
-                        hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
-                        onNewVersionDetected: () async {
-                          setState(() {
-                            _repositoriesWithNewVersions.add(repo.id!);
-                          });
-
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.reload();
-                          List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
-                          if (!savedIds.contains(repo.id!.toString())) {
-                            savedIds.add(repo.id!.toString());
-                            await prefs.setStringList('updated_repo_ids', savedIds);
-                          }
-                        },
-                        onVersionViewed: () async {
-                          setState(() {
-                            _repositoriesWithNewVersions.remove(repo.id!);
-                          });
-
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.reload();
-                          List<String> savedIds = prefs.getStringList('updated_repo_ids') ?? [];
-
-                          if (savedIds.contains(repo.id!.toString())) {
-                            savedIds.remove(repo.id!.toString());
-                            await prefs.setStringList('updated_repo_ids', savedIds);
-                          }
-                        },
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    child: Row(
+                      children: [
+                        FilterChip(
+                          label: const Text('All'),
+                          selected: !_showOnlyUpdates,
+                          showCheckmark: false,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                          side: BorderSide.none,
+                          selectedColor: colorscheme.primaryContainer,
+                          backgroundColor: colorscheme.surfaceContainerHigh,
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: !_showOnlyUpdates ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
+                          ),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _showOnlyUpdates = false;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        FilterChip(
+                          label: Text('Updates (${_repositoriesWithNewVersions.length})'),
+                          selected: _showOnlyUpdates,
+                          showCheckmark: false,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                          side: BorderSide.none,
+                          selectedColor: colorscheme.primaryContainer,
+                          backgroundColor: colorscheme.surfaceContainerHigh,
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: _showOnlyUpdates ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
+                          ),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _showOnlyUpdates = true;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
+                  if (displayedList.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40),
+                      child: Center(
+                        child: Text(
+                          _showOnlyUpdates ? "No updates available." : "No repositories added.",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: displayedList.length,
+                      itemBuilder: (context, index) {
+                        Repository repo = displayedList[index];
+
+                        return RepositoryTile(
+                          key: ValueKey(repo.id),
+                          refreshList: getAllSavedRepositories,
+                          repository: repo,
+                          hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
+                          onNewVersionDetected: () async {
+                            setState(() {
+                              _repositoriesWithNewVersions.add(repo.id!);
+                            });
+
+                            await SharedPrefUtil.reload();
+                            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
+                            if (!savedIds.contains(repo.id!.toString())) {
+                              savedIds.add(repo.id!.toString());
+                              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
+                            }
+                          },
+                          onVersionViewed: () async {
+                            setState(() {
+                              _repositoriesWithNewVersions.remove(repo.id!);
+                            });
+
+                            await SharedPrefUtil.reload();
+                            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
+
+                            if (savedIds.contains(repo.id!.toString())) {
+                              savedIds.remove(repo.id!.toString());
+                              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
+                            }
+                          },
+                        );
+                      },
+                    ),
                   const SizedBox(height: 75),
                 ],
               ),

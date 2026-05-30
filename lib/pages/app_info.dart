@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../util/app_details.dart';
+import '../util/app_constants.dart';
 
 class AppInfo extends StatelessWidget {
   const AppInfo({super.key});
 
   void _launchGithub() {
     launchUrl(
-      Uri.parse(AppDetails.repositoryLink),
+      Uri.parse(AppConstants.repositoryLink),
       mode: LaunchMode.externalApplication,
     );
   }
@@ -38,7 +38,7 @@ class AppInfo extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    AppDetails.appName,
+                    AppConstants.appName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -46,7 +46,7 @@ class AppInfo extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Version ${AppDetails.appVersion}',
+                    'Version ${AppConstants.appVersion}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                         ),

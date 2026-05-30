@@ -1,9 +1,10 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/material.dart';
 
-import '../util/app_details.dart';
+import '../util/app_constants.dart';
 import '../util/dialog_backup.dart';
 import '../util/dialog_select_theme.dart';
+import '../util/shared_pref_util.dart';
 import 'app_info.dart';
 import 'changelog.dart';
 
@@ -17,6 +18,25 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  String? _lastBackupDate;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadLastBackupDate();
+  }
+
+  Future<void> _loadLastBackupDate() async {
+    final date = await SharedPrefUtil.loadData<String>(AppConstants.sharedPrefsLastBackupDateKey);
+   
+    if (mounted) {
+      setState(() {
+        _lastBackupDate = date;
+      });
+    }
+  }
+
   String getThemeStringFormatted() {
     String theme = EasyDynamicTheme.of(context).themeMode.toString().replaceAll('ThemeMode.', '');
     if (theme == 'system') {
@@ -41,7 +61,7 @@ class _SettingsState extends State<Settings> {
               child: Column(
                 children: [
                   Text(
-                    AppDetails.appName,
+                    AppConstants.appName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -49,7 +69,7 @@ class _SettingsState extends State<Settings> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Version ${AppDetails.appVersion}',
+                    'Version ${AppConstants.appVersion}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                         ),
@@ -114,17 +134,21 @@ class _SettingsState extends State<Settings> {
                   child: Column(
                     children: [
                       ListTile(
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return DialogBackup(
-                              isCreateBackup: true,
-                              refreshList: () => {},
-                            );
-                          },
-                        ),
+                        onTap: () async {
+                          await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return DialogBackup(
+                                isCreateBackup: true,
+                                refreshList: () => {},
+                              );
+                            },
+                          );
+                          _loadLastBackupDate();
+                        },
                         leading: const Icon(Icons.save_outlined),
                         title: const Text("Backup now"),
+                        subtitle: _lastBackupDate != null ? Text("Last backup: $_lastBackupDate") : null,
                       ),
                       Divider(),
                       ListTile(

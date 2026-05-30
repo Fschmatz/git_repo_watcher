@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../util/app_details.dart';
+import '../util/app_constants.dart';
 
 class Changelog extends StatelessWidget {
   const Changelog({super.key});
@@ -34,7 +34,7 @@ class Changelog extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    AppDetails.changelogCurrent,
+                    AppConstants.changelogCurrent,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.9),
                           height: 1.5,
@@ -66,7 +66,7 @@ class Changelog extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    AppDetails.changelogsOld,
+                    AppConstants.changelogsOld,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 1.5,
