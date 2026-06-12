@@ -55,6 +55,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   Future<void> getRepositoryData() async {
+    if (!mounted) return;
     setState(() {
       _loadingData = true;
     });
@@ -79,7 +80,9 @@ class _RepositoryTileState extends State<RepositoryTile> {
         }
 
         await _update();
-        widget.refreshList();
+        if (mounted) {
+          widget.refreshList();
+        }
 
         Fluttertoast.showToast(msg: "Updated ${_repository.name}");
       } else if (responseRepo.statusCode == 403) {
@@ -91,9 +94,11 @@ class _RepositoryTileState extends State<RepositoryTile> {
       Fluttertoast.showToast(msg: "Error: ${e.toString()}");
     }
 
-    setState(() {
-      _loadingData = false;
-    });
+    if (mounted) {
+      setState(() {
+        _loadingData = false;
+      });
+    }
   }
 
   Future<void> _update() async {
@@ -169,7 +174,7 @@ class _RepositoryTileState extends State<RepositoryTile> {
   }
 
   void openBottomMenu() {
-    widget.onVersionViewed?.call();
+    //widget.onVersionViewed?.call();
     showModalBottomSheet(
       isScrollControlled: true,
       showDragHandle: true,
@@ -246,47 +251,48 @@ class _RepositoryTileState extends State<RepositoryTile> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                Container(
-                  decoration: BoxDecoration(
-                    color: colorscheme.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
+                  color: colorscheme.surfaceContainerHighest,
+                  clipBehavior: Clip.antiAlias,
                   child: Column(
                     children: [
+                      if (_repository.releasePublishedDate != 'null') ...[
+                        ListTile(
+                          leading: Icon(Icons.new_releases_outlined, color: colorscheme.primary),
+                          title: const Text("View Latest Release"),
+                          onTap: () {
+                            Navigator.of(bc).pop();
+                            _launchPage(widget.repository.releaseLink!);
+                          },
+                        ),
+                        Divider(),
+                      ],
                       ListTile(
                         leading: Icon(Icons.open_in_new_outlined, color: colorscheme.primary),
                         title: const Text("Open Repository"),
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(bc).pop();
                           _launchPage(widget.repository.link!);
                         },
                       ),
-                      if (_repository.releasePublishedDate != 'null') ...[
-                        ListTile(
-                          leading: Icon(Icons.new_releases_outlined, color: colorscheme.primary),
-                          title: const Text("Open Latest Release"),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            _launchPage(widget.repository.releaseLink!);
-                          },
-                        ),
-                      ],
+                      Divider(),
                       ListTile(
                         leading: Icon(Icons.refresh_outlined, color: colorscheme.primary),
-                        title: const Text("Refresh Data"),
+                        title: const Text("Refresh"),
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(bc).pop();
                           getRepositoryData();
                         },
                       ),
+                      Divider(),
                       ListTile(
                         leading: Icon(Icons.delete_outline_outlined, color: colorscheme.primary),
-                        title: Text("Delete"),
+                        title: const Text("Delete"),
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
                         onTap: () {
-                          Navigator.of(context).pop();
-                          showAlertDialogOkDelete(context);
+                          Navigator.of(bc).pop();
+                          showAlertDialogOkDelete(bc);
                         },
                       ),
                     ],

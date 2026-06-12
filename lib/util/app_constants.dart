@@ -4,7 +4,7 @@ class AppConstants {
   static const String sharedPrefsLastBackupDateKey = 'last_backup_date';
 
   // STRINGS
-  static const String appVersion = "1.7.4";
+  static const String appVersion = "1.7.5";
   static const String appName = "Git Repo Watcher Fschmatz";
   static const String appNameHomePage = "Git Repo Watcher";
   static const String backupFileName = "git_repo_watcher_backup";
@@ -16,6 +16,7 @@ $appVersion
 - Add refresh all notification
 - UI changes
 - Bug fixes
+- Flutter 3.44
 ''';
 
   static const String changelogsOld = '''

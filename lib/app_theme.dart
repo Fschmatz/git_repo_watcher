@@ -30,10 +30,12 @@ class _AppThemeState extends State<AppTheme> {
           return ThemeData(
             colorScheme: colorScheme,
             useMaterial3: true,
-            scaffoldBackgroundColor: colorScheme.surfaceContainerLow,
+           /*  
+           scaffoldBackgroundColor: colorScheme.surfaceContainerLow,
             appBarTheme: AppBarThemeData(
               backgroundColor: colorScheme.surfaceContainerLow,
-            ),
+            ), 
+            */
             cardTheme: CardThemeData(
               color: colorScheme.surfaceContainerHigh,
               elevation: 0,
@@ -47,7 +49,7 @@ class _AppThemeState extends State<AppTheme> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
-              backgroundColor: colorScheme.surfaceContainerHigh,
+              //backgroundColor: colorScheme.surfaceContainerHigh,
             ),
             popupMenuTheme: PopupMenuThemeData(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

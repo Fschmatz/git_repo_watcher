@@ -53,9 +53,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     await SharedPrefUtil.reload();
     List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
 
+    // Filter out IDs that no longer exist
+    List<int> currentRepoIds = _repositoriesList.map((e) => e.id!).toList();
+    List<String> validSavedIds = savedIds.where((id) => currentRepoIds.contains(int.parse(id))).toList();
+
+    if (savedIds.length != validSavedIds.length) {
+      await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, validSavedIds);
+    }
+
     if (mounted) {
       setState(() {
-        _repositoriesWithNewVersions.addAll(savedIds.map((e) => int.parse(e)));
+        _repositoriesWithNewVersions.clear();
+        _repositoriesWithNewVersions.addAll(validSavedIds.map((e) => int.parse(e)));
         _loading = false;
       });
     }
@@ -123,7 +132,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   children: const [
                     Icon(Icons.add_outlined),
                     SizedBox(width: 12),
-                    Text('Add'),
+                    Text('Add repository'),
                   ],
                 ),
               ),
@@ -133,7 +142,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   children: const [
                     Icon(Icons.done_all_outlined),
                     SizedBox(width: 12),
-                    Text('Mark all as seen'),
+                    Text('Clear updates'),
                   ],
                 ),
               ),
