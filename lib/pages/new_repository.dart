@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../db/repository_dao.dart';
 import '../classes/release.dart';
 import '../classes/repository.dart';
 import '../service/github_service.dart';
+import '../util/toast_utils.dart';
 
 class NewRepository extends StatefulWidget {
   final Function refreshList;
@@ -41,7 +41,7 @@ class _NewRepositoryState extends State<NewRepository> {
       _saveRepository();
       widget.refreshList();
     } else {
-      Fluttertoast.showToast(msg: "Error Saving Repository Data");
+      ToastUtils.showErrorMessage("Error Saving Repository Data");
     }
   }
 

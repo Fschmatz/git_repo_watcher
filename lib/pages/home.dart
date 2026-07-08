@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/pages/new_repository.dart';
 import 'package:git_repo_watcher/pages/settings.dart';
@@ -10,6 +9,8 @@ import 'package:git_repo_watcher/util/shared_pref_util.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../util/toast_utils.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -17,17 +18,37 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int _currentTabIndex = 0;
   List<Repository> _repositoriesList = [];
   bool _loading = true;
   bool _refreshing = false;
-  bool _showOnlyUpdates = false;
   final Set<int> _repositoriesWithNewVersions = {};
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    _tabController = TabController(length: 2, vsync: this);
+
+    _tabController.animation!.addListener(() {
+      int value = _tabController.animation!.value.round();
+      if (value != _currentTabIndex) {
+        setState(() {
+          _currentTabIndex = value;
+        });
+      }
+    });
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging && _tabController.index != _currentTabIndex) {
+        setState(() {
+          _currentTabIndex = _tabController.index;
+        });
+      }
+    });
 
     Permission.notification.request();
 
@@ -36,6 +57,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _tabController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -78,7 +100,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       _refreshing = true;
     });
 
-    Fluttertoast.showToast(msg: "Refreshing...");
+    ToastUtils.show("Refreshing...");
 
     final result = await BackgroundService.runRefreshTask();
 
@@ -89,7 +111,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       });
 
       if (result.hitRateLimit) {
-        Fluttertoast.showToast(msg: "API Rate limit reached");
+        ToastUtils.showErrorMessage("API Rate limit reached");
       }
 
       getAllSavedRepositories();
@@ -106,9 +128,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final colorscheme = Theme.of(context).colorScheme;
-
-    List<Repository> displayedList =
-        _showOnlyUpdates ? _repositoriesList.where((repo) => _repositoriesWithNewVersions.contains(repo.id)).toList() : _repositoriesList;
 
     return Scaffold(
       appBar: AppBar(
@@ -184,16 +203,15 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         duration: const Duration(milliseconds: 450),
         child: _loading
             ? const Center(child: SizedBox.shrink())
-            : ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
+            : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Row(
                       children: [
                         FilterChip(
                           label: const Text('All'),
-                          selected: !_showOnlyUpdates,
+                          selected: _currentTabIndex == 0,
                           showCheckmark: false,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -202,18 +220,16 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           backgroundColor: colorscheme.surfaceContainerHigh,
                           labelStyle: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: !_showOnlyUpdates ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
+                            color: _currentTabIndex == 0 ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
                           ),
                           onSelected: (bool selected) {
-                            setState(() {
-                              _showOnlyUpdates = false;
-                            });
+                            _tabController.animateTo(0);
                           },
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           label: Text('Updates (${_repositoriesWithNewVersions.length})'),
-                          selected: _showOnlyUpdates,
+                          selected: _currentTabIndex == 1,
                           showCheckmark: false,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -222,76 +238,89 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           backgroundColor: colorscheme.surfaceContainerHigh,
                           labelStyle: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: _showOnlyUpdates ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
+                            color: _currentTabIndex == 1 ? colorscheme.onPrimaryContainer : colorscheme.onSurfaceVariant,
                           ),
                           onSelected: (bool selected) {
-                            setState(() {
-                              _showOnlyUpdates = true;
-                            });
+                            _tabController.animateTo(1);
                           },
                         ),
                       ],
                     ),
                   ),
-                  if (displayedList.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: Center(
-                        child: Text(
-                          _showOnlyUpdates ? "No updates available." : "No repositories added.",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildList(_repositoriesList, "No repositories added."),
+                        _buildList(
+                          _repositoriesList.where((repo) => _repositoriesWithNewVersions.contains(repo.id)).toList(),
+                          "No updates available.",
                         ),
-                      ),
-                    )
-                  else
-                    ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: displayedList.length,
-                      itemBuilder: (context, index) {
-                        Repository repo = displayedList[index];
-
-                        return RepositoryTile(
-                          key: ValueKey(repo.id),
-                          refreshList: getAllSavedRepositories,
-                          repository: repo,
-                          hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
-                          onNewVersionDetected: () async {
-                            setState(() {
-                              _repositoriesWithNewVersions.add(repo.id!);
-                            });
-
-                            await SharedPrefUtil.reload();
-                            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
-                            if (!savedIds.contains(repo.id!.toString())) {
-                              savedIds.add(repo.id!.toString());
-                              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
-                            }
-                          },
-                          onVersionViewed: () async {
-                            setState(() {
-                              _repositoriesWithNewVersions.remove(repo.id!);
-                            });
-
-                            await SharedPrefUtil.reload();
-                            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
-
-                            if (savedIds.contains(repo.id!.toString())) {
-                              savedIds.remove(repo.id!.toString());
-                              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
-                            }
-                          },
-                        );
-                      },
+                      ],
                     ),
-                  const SizedBox(height: 75),
+                  ),
                 ],
               ),
       ),
+    );
+  }
+
+  Widget _buildList(List<Repository> list, String emptyMessage) {
+    if (list.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 40),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Text(
+            emptyMessage,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 75),
+      separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        Repository repo = list[index];
+
+        return RepositoryTile(
+          key: ValueKey(repo.id),
+          refreshList: getAllSavedRepositories,
+          repository: repo,
+          hasNewVersion: _repositoriesWithNewVersions.contains(repo.id),
+          onNewVersionDetected: () async {
+            setState(() {
+              _repositoriesWithNewVersions.add(repo.id!);
+            });
+
+            await SharedPrefUtil.reload();
+            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
+            if (!savedIds.contains(repo.id!.toString())) {
+              savedIds.add(repo.id!.toString());
+              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
+            }
+          },
+          onVersionViewed: () async {
+            setState(() {
+              _repositoriesWithNewVersions.remove(repo.id!);
+            });
+
+            await SharedPrefUtil.reload();
+            List<String> savedIds = await SharedPrefUtil.loadData<List<String>>(AppConstants.sharedPrefsUpdatedRepoIdsKey) ?? [];
+
+            if (savedIds.contains(repo.id!.toString())) {
+              savedIds.remove(repo.id!.toString());
+              await SharedPrefUtil.saveData(AppConstants.sharedPrefsUpdatedRepoIdsKey, savedIds);
+            }
+          },
+        );
+      },
     );
   }
 }

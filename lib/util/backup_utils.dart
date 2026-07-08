@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:git_repo_watcher/util/toast_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../service/repository_service.dart';
@@ -56,13 +56,9 @@ class BackupUtils {
     if (list.isNotEmpty) {
       await _saveListAsJson(list, fileName);
 
-      Fluttertoast.showToast(
-        msg: "Backup completed!",
-      );
+      ToastUtils.show("Backup completed!");
     } else {
-      Fluttertoast.showToast(
-        msg: "No data found!",
-      );
+      ToastUtils.showErrorMessage("No data found!");
     }
   }
 
@@ -74,9 +70,7 @@ class BackupUtils {
 
       await file.writeAsString(json.encode(data));
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Error!",
-      );
+      ToastUtils.showError();
     }
   }
 
@@ -93,13 +87,11 @@ class BackupUtils {
       await _deleteAll();
       await _insertAll(jsonData);
 
-      Fluttertoast.showToast(
-        msg: "Success!",
+      ToastUtils.show(
+        "Success!",
       );
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Error!",
-      );
+      ToastUtils.showError();
     }
   }
 }

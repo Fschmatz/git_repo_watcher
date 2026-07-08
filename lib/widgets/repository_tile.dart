@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
 import 'package:git_repo_watcher/util/utils_date.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../classes/release.dart';
 import '../service/github_service.dart';
 import '../service/repository_service.dart';
+import '../util/toast_utils.dart';
 
 class RepositoryTile extends StatefulWidget {
   final Repository repository;
@@ -84,14 +84,14 @@ class _RepositoryTileState extends State<RepositoryTile> {
           widget.refreshList();
         }
 
-        Fluttertoast.showToast(msg: "Updated ${_repository.name}");
+        ToastUtils.show("Updated ${_repository.name}");
       } else if (responseRepo.statusCode == 403) {
-        Fluttertoast.showToast(msg: "API Limit Reached");
+        ToastUtils.showErrorMessage("API Limit Reached");
       } else {
-        Fluttertoast.showToast(msg: "Error Loading");
+        ToastUtils.showErrorMessage("Error Loading");
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+      ToastUtils.showErrorMessage("Error: ${e.toString()}");
     }
 
     if (mounted) {

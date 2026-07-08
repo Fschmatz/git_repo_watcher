@@ -3,6 +3,7 @@ import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:git_repo_watcher/pages/home.dart';
+import 'package:git_repo_watcher/util/toast_utils.dart';
 
 class AppTheme extends StatefulWidget {
   const AppTheme({super.key});
@@ -29,13 +30,7 @@ class _AppThemeState extends State<AppTheme> {
         ThemeData buildTheme(ColorScheme colorScheme) {
           return ThemeData(
             colorScheme: colorScheme,
-            useMaterial3: true,
-           /*  
-           scaffoldBackgroundColor: colorScheme.surfaceContainerLow,
-            appBarTheme: AppBarThemeData(
-              backgroundColor: colorScheme.surfaceContainerLow,
-            ), 
-            */
+            useMaterial3: true,           
             cardTheme: CardThemeData(
               color: colorScheme.surfaceContainerHigh,
               elevation: 0,
@@ -48,8 +43,7 @@ class _AppThemeState extends State<AppTheme> {
             bottomSheetTheme: BottomSheetThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-              ),
-              //backgroundColor: colorScheme.surfaceContainerHigh,
+              ),             
             ),
             popupMenuTheme: PopupMenuThemeData(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -77,6 +71,7 @@ class _AppThemeState extends State<AppTheme> {
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: ToastUtils.scaffoldMessengerKey,
           theme: buildTheme(lightScheme),
           darkTheme: buildTheme(darkScheme),
           themeMode: EasyDynamicTheme.of(context).themeMode,
