@@ -17,13 +17,13 @@ class DialogBackup extends StatefulWidget {
 
 class _DialogBackupState extends State<DialogBackup> {
   Future<void> _createBackup() async {
-    await BackupUtils().backupData(AppConstants.backupFileName);
+    await BackupUtils().backupData();
     String currentDate = Jiffy.now().format(pattern: 'dd/MM/yyyy');
     await SharedPrefUtil.saveData(AppConstants.sharedPrefsLastBackupDateKey, currentDate);
   }
 
   Future<void> _restoreFromBackup() async {
-    await BackupUtils().restoreBackupData(AppConstants.backupFileName);
+    await BackupUtils().restoreBackupData();
   }
 
   @override

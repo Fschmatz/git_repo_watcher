@@ -7,7 +7,6 @@ import 'package:git_repo_watcher/service/repository_service.dart';
 import 'package:git_repo_watcher/util/app_constants.dart';
 import 'package:git_repo_watcher/util/shared_pref_util.dart';
 import 'package:git_repo_watcher/widgets/repository_tile.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../util/toast_utils.dart';
 
@@ -49,8 +48,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
         });
       }
     });
-
-    Permission.notification.request();
 
     getAllSavedRepositories();
   }

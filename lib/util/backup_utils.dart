@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:git_repo_watcher/util/toast_utils.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:git_repo_watcher/util/utils_functions.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../service/repository_service.dart';
 
@@ -25,73 +28,54 @@ class BackupUtils {
 
   /* END PER APP SPECIFIC FUNCTIONS */
 
-  Future<void> _loadStoragePermission() async {
-    var status = await Permission.manageExternalStorage.status;
-
-    if (!status.isGranted) {
-      await Permission.manageExternalStorage.request();
-    }
-  }
-
-  // Always using Android Download folder
-  Future<String> _loadDirectory() async {
-    bool dirDownloadExists = true;
-    String directory = "/storage/emulated/0/Download/";
-
-    dirDownloadExists = await Directory(directory).exists();
-    if (dirDownloadExists) {
-      directory = "/storage/emulated/0/Download/";
-    } else {
-      directory = "/storage/emulated/0/Downloads/";
-    }
-
-    return directory;
-  }
-
-  Future<void> backupData(String fileName) async {
-    await _loadStoragePermission();
-
+  Future<void> backupData() async {
     List<Map<String, dynamic>> list = await _loadAll();
 
     if (list.isNotEmpty) {
-      await _saveListAsJson(list, fileName);
-
-      ToastUtils.show("Backup completed!");
+      await _saveListAsJsonAndShare(list);
     } else {
       ToastUtils.showErrorMessage("No data found!");
     }
   }
 
-  Future<void> _saveListAsJson(List<Map<String, dynamic>> data, String fileName) async {
+  Future<bool> _saveListAsJsonAndShare(List<Map<String, dynamic>> data) async {
     try {
-      String directory = await _loadDirectory();
-
-      final file = File('$directory/$fileName.json');
+      final directory = await getTemporaryDirectory();
+      final newFileName = getBackupFilename();
+      final file = File('${directory.path}/$newFileName');
 
       await file.writeAsString(json.encode(data));
+
+      await Share.shareXFiles([XFile(file.path)], text: 'Backup $newFileName');
+      return true;
     } catch (e) {
-      ToastUtils.showError();
+      ToastUtils.showErrorMessage('Error!');
+      return false;
     }
   }
 
-  Future<void> restoreBackupData(String fileName) async {
-    await _loadStoragePermission();
-
+  Future<bool> restoreBackupData() async {
     try {
-      String directory = await _loadDirectory();
-
-      final file = File('$directory/$fileName.json');
-      final jsonString = await file.readAsString();
-      final List<dynamic> jsonData = json.decode(jsonString);
-
-      await _deleteAll();
-      await _insertAll(jsonData);
-
-      ToastUtils.show(
-        "Success!",
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
       );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final jsonString = await file.readAsString();
+        final List<dynamic> jsonData = json.decode(jsonString);
+
+        await _deleteAll();
+        await _insertAll(jsonData);
+
+        ToastUtils.show("Success!");
+        return true;
+      }
+      return false;
     } catch (e) {
-      ToastUtils.showError();
+      ToastUtils.showErrorMessage('Error!');
+      return false;
     }
   }
 }
