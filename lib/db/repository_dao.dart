@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 class RepositoryDao {
   static const _databaseName = 'Repo.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
 
   static const table = 'repositories';
   static const columnId = 'id';
@@ -20,6 +20,7 @@ class RepositoryDao {
   static const columnReleaseLink = 'releaseLink';
   static const columnReleaseVersion = 'releaseVersion';
   static const columnReleasePublishedDate = 'releasePublishedDate';
+  static const columnReleaseBody = 'releaseBody';
 
   static Database? _database;
 
@@ -32,7 +33,13 @@ class RepositoryDao {
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path, version: _databaseVersion, onCreate: _onCreate);
+    return await openDatabase(path, version: _databaseVersion, onCreate: _onCreate, onUpgrade: _onUpgrade);
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $columnReleaseBody TEXT');
+    }
   }
 
   Future _onCreate(Database db, int version) async {
@@ -48,7 +55,8 @@ class RepositoryDao {
            $columnDefaultBranch TEXT,
            $columnReleaseLink TEXT, 
            $columnReleaseVersion TEXT,  
-           $columnReleasePublishedDate TEXT                 
+           $columnReleasePublishedDate TEXT,
+           $columnReleaseBody TEXT
           )
           ''');
   }

@@ -56,6 +56,7 @@ class BackgroundService {
           updatedRepo.releaseLink = release.link;
           updatedRepo.releaseVersion = release.version;
           updatedRepo.releasePublishedDate = release.publishedDate;
+          updatedRepo.releaseBody = release.body;
           updatedRepo.id = repo.id;
           updatedRepo.note = repo.note;
 

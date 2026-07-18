@@ -4,7 +4,7 @@ class AppConstants {
   static const String sharedPrefsLastBackupDateKey = 'last_backup_date';
 
   // STRINGS
-  static const String appVersion = "1.7.7";
+  static const String appVersion = "1.8.0";
   static const String appName = "Git Repo Watcher Fschmatz";
   static const String appNameHomePage = "Git Repo Watcher";
   static const String backupFileName = "git_repo_watcher_backup";
@@ -12,15 +12,21 @@ class AppConstants {
 
   static const String changelogCurrent = '''
 $appVersion
+- Add release note
+- Edit repository
+- Bug fixes
+- UI changes
+''';
+
+  static const String changelogsOld = '''
+1.7.7
 - Material Expressive Design
 - Add refresh all notification
 - UI changes
 - Bug fixes
 - New backup logic 
 - Flutter 3.44
-''';
 
-  static const String changelogsOld = '''
 1.6.6
 - UI changes
 - Added GitHub token

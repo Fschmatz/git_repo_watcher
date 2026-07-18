@@ -56,6 +56,10 @@ class RepositoryService {
       row[RepositoryDao.columnReleasePublishedDate] = repository.releasePublishedDate;
     }
 
+    if (repository.releaseBody != null && repository.releaseBody!.isNotEmpty) {
+      row[RepositoryDao.columnReleaseBody] = repository.releaseBody;
+    }
+
     await repositoryDao.update(row);
   }
 

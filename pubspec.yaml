@@ -1,7 +1,7 @@
 name: git_repo_watcher
 description: Flutter project.
 publish_to: "none"
-version: 1.7.7
+version: 1.8.0
 
 environment:
   sdk: ">=3.2.6 <4.0.0"
@@ -23,6 +23,7 @@ dependencies:
   share_plus: ^10.0.0
   flutter_local_notifications: ^21.0.0
   workmanager: ^0.9.0+3
+  flutter_markdown_plus: ^1.0.12
 
 dev_dependencies:
   flutter_test:

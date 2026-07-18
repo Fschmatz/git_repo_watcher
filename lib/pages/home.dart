@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:git_repo_watcher/classes/repository.dart';
-import 'package:git_repo_watcher/pages/new_repository.dart';
 import 'package:git_repo_watcher/pages/settings.dart';
+import 'package:git_repo_watcher/pages/store_repository.dart';
 import 'package:git_repo_watcher/service/background_service.dart';
 import 'package:git_repo_watcher/service/repository_service.dart';
 import 'package:git_repo_watcher/util/app_constants.dart';
@@ -179,7 +179,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => NewRepository(refreshList: getAllSavedRepositories),
+                      builder: (BuildContext context) => StoreRepository(refreshList: getAllSavedRepositories),
                     ),
                   );
                 case 1:

@@ -12,6 +12,7 @@ class Repository {
   String? releaseLink;
   String? releaseVersion;
   String? releasePublishedDate;
+  String? releaseBody;
 
   Repository(
       {this.id,
@@ -24,7 +25,8 @@ class Repository {
       required this.defaultBranch,
       this.releaseLink,
       this.releaseVersion,
-      this.releasePublishedDate});
+      this.releasePublishedDate,
+      this.releaseBody});
 
   factory Repository.fromJSON(dynamic json) {
     final value = DynamicValue(json);
@@ -52,6 +54,7 @@ class Repository {
       releaseLink: map['releaseLink'],
       releaseVersion: map['releaseVersion'],
       releasePublishedDate: map['releasePublishedDate'],
+      releaseBody: map['releaseBody'],
     );
   }
 
@@ -68,6 +71,7 @@ class Repository {
       'releaseLink': releaseLink,
       'releaseVersion': releaseVersion,
       'releasePublishedDate': releasePublishedDate,
+      'releaseBody': releaseBody,
     };
   }
 }

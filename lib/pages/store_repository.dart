@@ -7,26 +7,53 @@ import '../../db/repository_dao.dart';
 import '../classes/release.dart';
 import '../classes/repository.dart';
 import '../service/github_service.dart';
+import '../service/repository_service.dart';
 import '../util/toast_utils.dart';
 
-class NewRepository extends StatefulWidget {
+class StoreRepository extends StatefulWidget {
   final Function refreshList;
+  final Repository? repositoryToEdit;
 
-  const NewRepository({Key? key, required this.refreshList}) : super(key: key);
+  const StoreRepository({super.key, required this.refreshList, this.repositoryToEdit});
 
   @override
-  State<NewRepository> createState() => _NewRepositoryState();
+  State<StoreRepository> createState() => _StoreRepositoryState();
 }
 
-class _NewRepositoryState extends State<NewRepository> {
+class _StoreRepositoryState extends State<StoreRepository> {
   late Repository _repo;
-  late Release _release;
+  Release? _release;
   final _repositories = RepositoryDao.instance;
   TextEditingController controllerRepoLink = TextEditingController();
   TextEditingController controllerRepoNote = TextEditingController();
   bool _validLink = true;
+  bool _isUpdate = false;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.repositoryToEdit != null) {
+      _repo = widget.repositoryToEdit!;
+      controllerRepoLink.text = _repo.link ?? '';
+      controllerRepoNote.text = _repo.note ?? '';
+      _isUpdate = true;
+    }
+  }
 
   Future<void> getRepositoryDataAndSave() async {
+    if (_isUpdate) {
+      _repo.note = controllerRepoNote.text;
+
+      await RepositoryService().update(_repo);
+
+      widget.refreshList();
+      ToastUtils.showSuccess();
+
+      return;
+    }
+
     List<String> formattedRepositoryData = controllerRepoLink.text.split('/');
     final responseRepo = await GitHubService().getRepositoryData(formattedRepositoryData);
     final responseRelease = await GitHubService().getRepositoryLatestReleaseData(formattedRepositoryData);
@@ -34,12 +61,14 @@ class _NewRepositoryState extends State<NewRepository> {
     if (responseRepo.statusCode == 200) {
       _repo = Repository.fromJSON(jsonDecode(responseRepo.body));
       _release = Release.fromJSON(jsonDecode(responseRelease.body));
-      _repo.releaseLink = _release.link;
-      _repo.releaseVersion = _release.version;
-      _repo.releasePublishedDate = _release.publishedDate;
+      _repo.releaseLink = _release!.link;
+      _repo.releaseVersion = _release!.version;
+      _repo.releasePublishedDate = _release!.publishedDate;
+      _repo.releaseBody = _release!.body;
 
-      _saveRepository();
+      await _saveRepository();
       widget.refreshList();
+      ToastUtils.showSuccess();
     } else {
       ToastUtils.showErrorMessage("Error Saving Repository Data");
     }
@@ -57,6 +86,7 @@ class _NewRepositoryState extends State<NewRepository> {
       RepositoryDao.columnReleaseLink: _repo.releaseLink,
       RepositoryDao.columnReleaseVersion: _repo.releaseVersion,
       RepositoryDao.columnReleasePublishedDate: _repo.releasePublishedDate,
+      RepositoryDao.columnReleaseBody: _repo.releaseBody,
     };
 
     await _repositories.insert(row);
@@ -74,13 +104,13 @@ class _NewRepositoryState extends State<NewRepository> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Repository')),
+      appBar: AppBar(title: Text(_isUpdate ? 'Edit' : 'New')),
       body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextField(
-              autofocus: true,
+              enabled: !_isUpdate,
               minLines: 1,
               maxLines: 3,
               maxLength: 500,
@@ -88,15 +118,11 @@ class _NewRepositoryState extends State<NewRepository> {
               textCapitalization: TextCapitalization.sentences,
               keyboardType: TextInputType.name,
               controller: controllerRepoLink,
+              readOnly: _isUpdate,
               decoration: InputDecoration(
                 labelText: "Link",
                 helperText: "* Required",
                 counterText: "",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
                 errorText: (_validLink) ? null : "Link is empty",
               ),
             ),
@@ -106,7 +132,7 @@ class _NewRepositoryState extends State<NewRepository> {
             child: TextField(
               minLines: 1,
               maxLines: 3,
-              maxLength: 500,
+              maxLength: 250,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
               textCapitalization: TextCapitalization.sentences,
               keyboardType: TextInputType.name,
@@ -114,35 +140,35 @@ class _NewRepositoryState extends State<NewRepository> {
               decoration: InputDecoration(
                 labelText: "Note",
                 counterText: "",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-            child: FilledButton.tonalIcon(
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(56),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-              ),
-              onPressed: () async {
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isSaving
+            ? null
+            : () async {
                 if (validateTextFields()) {
-                  getRepositoryDataAndSave().then((v) => Navigator.of(context).pop());
+                  setState(() => _isSaving = true);
+                  await getRepositoryDataAndSave();
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
                 } else {
                   setState(() {
                     _validLink;
                   });
                 }
               },
-              icon: const Icon(Icons.save_outlined),
-              label: const Text('Save'),
-            ),
-          ),
-        ],
+        icon: _isSaving
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.save_outlined),
+        label: Text(_isSaving ? 'Saving...' : 'Save'),
       ),
     );
   }
