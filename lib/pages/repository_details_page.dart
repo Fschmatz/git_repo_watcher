@@ -11,8 +11,8 @@ import '../service/repository_service.dart';
 import '../util/toast_utils.dart';
 import '../util/utils_date.dart';
 import '../widgets/info_chip.dart';
-import '../widgets/primary_info_card.dart';
 import '../widgets/release_notes_card.dart';
+import 'full_release_notes_page.dart';
 import 'store_repository.dart';
 
 class RepositoryDetailsPage extends StatefulWidget {
@@ -87,6 +87,19 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
+  void _openFullReleaseNotes() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FullReleaseNotesPage(
+          title: _repository.name ?? 'Release Notes',
+          version: _repository.releaseVersion,
+          releaseBody: _repository.releaseBody ?? '',
+        ),
+      ),
+    );
+  }
+
   void _showAlertDialogOkDelete(BuildContext context) {
     showDialog(
       context: context,
@@ -96,7 +109,11 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
           content: const Text("Delete ?"),
           actions: [
             TextButton(
-              child: const Text("Yes"),
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            FilledButton.tonal(
+              child: const Text("Delete"),
               onPressed: () async {
                 Navigator.of(context).pop();
                 await RepositoryService().delete(_repository);
@@ -114,32 +131,92 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
   Widget build(BuildContext context) {
     final colorscheme = Theme.of(context).colorScheme;
 
+    final hasVersion = _repository.releaseVersion != null && _repository.releaseVersion != 'null' && _repository.releaseVersion!.isNotEmpty;
+    final hasReleaseDate = _repository.releasePublishedDate != null && _repository.releasePublishedDate != 'null';
+    final hasGitDate = _repository.lastUpdate != null && _repository.lastUpdate != 'null';
+    final hasNote = _repository.note != null && _repository.note!.isNotEmpty;
+    final hasReleaseBody = _repository.releaseBody != null && _repository.releaseBody!.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_repository.name ?? ''),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => StoreRepository(
-                    repositoryToEdit: _repository,
-                    refreshList: () {
-                      widget.onRefresh();
-                      setState(() {});
-                    },
-                  ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: "More options",
+            onSelected: (value) {
+              switch (value) {
+                case 'refresh':
+                  if (!_loadingData) _getRepositoryData();
+                  break;
+                case 'share':
+                  if (_repository.link != null) {
+                    Share.share(_repository.link!);
+                  }
+                  break;
+                case 'edit':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StoreRepository(
+                        repositoryToEdit: _repository,
+                        refreshList: () {
+                          widget.onRefresh();
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  );
+                  break;
+                case 'delete':
+                  _showAlertDialogOkDelete(context);
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'refresh',
+                child: Row(
+                  children: [
+                    Icon(Icons.refresh_outlined),
+                    SizedBox(width: 12),
+                    Text("Refresh"),
+                  ],
                 ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline_outlined),
-            onPressed: () {
-              _showAlertDialogOkDelete(context);
-            },
+              ),
+              const PopupMenuItem<String>(
+                value: 'share',
+                child: Row(
+                  children: [
+                    Icon(Icons.share_outlined),
+                    SizedBox(width: 12),
+                    Text("Share"),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_outlined),
+                    SizedBox(width: 12),
+                    Text("Edit"),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline_outlined),
+                    const SizedBox(width: 12),
+                    Text(
+                      "Delete",
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
         bottom: _loadingData
@@ -154,91 +231,171 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_repository.note != null && _repository.note!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: PrimaryInfoCard(
-                  label: "Note",
-                  value: _repository.note!,
-                  icon: Icons.notes_outlined,
-                ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorscheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(20),
               ),
-            const SizedBox(height: 12),
-            if (_repository.releaseVersion != 'null' && _repository.releaseVersion != null && _repository.releaseVersion!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: PrimaryInfoCard(
-                  label: "Version",
-                  value: _repository.releaseVersion!.length > 25 ? '${_repository.releaseVersion!.substring(0, 25)}...' : _repository.releaseVersion!,
-                  icon: Icons.sell_outlined,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: colorscheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.sell_outlined,
+                          size: 22,
+                          color: colorscheme.onPrimaryContainer,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Version",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: colorscheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(
+                              hasVersion ? _repository.releaseVersion! : "No release version",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: colorscheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (hasNote) ...[
+                    const SizedBox(height: 20),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.sticky_note_2_outlined,
+                          size: 20,
+                          color: colorscheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _repository.note!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorscheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
               ),
-            Row(
-              children: [
-                if (_repository.releasePublishedDate != 'null' && _repository.releasePublishedDate != null)
-                  Expanded(
-                    child: InfoChip(
-                      label: "Latest Release",
-                      value: UtilsDate.format(_repository.releasePublishedDate!),
-                      icon: Icons.event_available_outlined,
-                    ),
-                  ),
-                if (_repository.releasePublishedDate != 'null' && _repository.lastUpdate != 'null') const SizedBox(width: 12),
-                if (_repository.lastUpdate != 'null' && _repository.lastUpdate != null)
-                  Expanded(
-                    child: InfoChip(
-                      label: "Latest Git Update",
-                      value: UtilsDate.format(_repository.lastUpdate!),
-                      icon: Icons.history_outlined,
-                    ),
-                  ),
-              ],
             ),
-            const SizedBox(height: 12),
-            if (_repository.releaseBody != null && _repository.releaseBody!.isNotEmpty)
+            if (hasReleaseDate || hasGitDate) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  if (hasReleaseDate)
+                    Expanded(
+                      child: InfoChip(
+                        label: "Latest Release",
+                        value: UtilsDate.format(_repository.releasePublishedDate!),
+                        icon: Icons.event_available_outlined,
+                      ),
+                    ),
+                  if (hasReleaseDate && hasGitDate) const SizedBox(width: 12),
+                  if (hasGitDate)
+                    Expanded(
+                      child: InfoChip(
+                        label: "Latest Git Update",
+                        value: UtilsDate.format(_repository.lastUpdate!),
+                        icon: Icons.history_outlined,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            if (hasReleaseBody) ...[
+              const SizedBox(height: 20),
               ReleaseNotesCard(
                 releaseBody: _repository.releaseBody!,
                 onLinkTap: (href) => _launchPage(href),
+                onExpandTap: _openFullReleaseNotes,
               ),
+            ],
+            const SizedBox(height: 10),
             Card(
               margin: EdgeInsets.zero,
-              color: colorscheme.surfaceContainerHighest,
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
-                  if (_repository.releasePublishedDate != 'null') ...[
+                  if (_repository.releaseLink != null && _repository.releaseLink!.isNotEmpty) ...[
                     ListTile(
-                      leading: Icon(Icons.new_releases_outlined, color: colorscheme.primary),
-                      title: const Text("View Latest Release"),
+                      leading: CircleAvatar(
+                        radius: 18,
+                        backgroundColor: colorscheme.primaryContainer,
+                        child: Icon(
+                          Icons.new_releases_outlined,
+                          size: 20,
+                          color: colorscheme.onPrimaryContainer,
+                        ),
+                      ),
+                      title: const Text(
+                        "View on GitHub Releases",
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      ),
+                      subtitle: const Text(
+                        "Open last release page",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                       onTap: () {
                         _launchPage(_repository.releaseLink!);
                       },
                     ),
-                    const Divider(),
+                    Divider(),
                   ],
-                  ListTile(
-                    leading: Icon(Icons.open_in_new_outlined, color: colorscheme.primary),
-                    title: const Text("Open Repository"),
-                    onTap: () {
-                      _launchPage(_repository.link!);
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: Icon(Icons.refresh_outlined, color: colorscheme.primary),
-                    title: const Text("Refresh"),
-                    onTap: () {
-                      _getRepositoryData();
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: Icon(Icons.share_outlined, color: colorscheme.primary),
-                    title: const Text("Share"),
-                    onTap: () {
-                      Share.share(_repository.link!);
-                    },
-                  ),
+                  if (_repository.link != null && _repository.link!.isNotEmpty)
+                    ListTile(
+                      leading: CircleAvatar(
+                        radius: 18,
+                        backgroundColor: colorscheme.secondaryContainer,
+                        child: Icon(
+                          Icons.code_rounded,
+                          size: 20,
+                          color: colorscheme.onSecondaryContainer,
+                        ),
+                      ),
+                      title: const Text(
+                        "Open Repository",
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      ),
+                      subtitle: const Text(
+                        "Source code on GitHub",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      trailing: const Icon(Icons.open_in_new, size: 16),
+                      onTap: () {
+                        _launchPage(_repository.link!);
+                      },
+                    ),
                 ],
               ),
             ),

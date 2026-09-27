@@ -139,7 +139,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             icon: const Icon(Icons.more_vert_outlined),
             itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
               PopupMenuItem<int>(
@@ -152,7 +151,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
                   ],
                 ),
               ),
-              PopupMenuItem<int>(
+              /*PopupMenuItem<int>(
                 value: 1,
                 child: Row(
                   children: const [
@@ -161,7 +160,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
                     Text('Clear updates'),
                   ],
                 ),
-              ),
+              ),*/
               PopupMenuItem<int>(
                 value: 2,
                 child: Row(
@@ -182,8 +181,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
                       builder: (BuildContext context) => StoreRepository(refreshList: getAllSavedRepositories),
                     ),
                   );
-                case 1:
-                  _markAllAsRead();
+                /* case 1:
+                  _markAllAsRead();*/
                 case 2:
                   Navigator.push(
                     context,
@@ -259,6 +258,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, SingleTickerPr
                 ],
               ),
       ),
+      floatingActionButton: _currentTabIndex == 1 && _repositoriesWithNewVersions.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: _markAllAsRead,
+              tooltip: 'Clear updates',
+              child: const Icon(Icons.done_all_outlined),
+            )
+          : null,
     );
   }
 

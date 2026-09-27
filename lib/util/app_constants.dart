@@ -4,7 +4,7 @@ class AppConstants {
   static const String sharedPrefsLastBackupDateKey = 'last_backup_date';
 
   // STRINGS
-  static const String appVersion = "1.8.0";
+  static const String appVersion = "1.8.1";
   static const String appName = "Git Repo Watcher Fschmatz";
   static const String appNameHomePage = "Git Repo Watcher";
   static const String backupFileName = "git_repo_watcher_backup";
