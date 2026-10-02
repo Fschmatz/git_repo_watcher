@@ -231,6 +231,31 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (hasReleaseDate || hasGitDate) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  if (hasReleaseDate)
+                    Expanded(
+                      child: InfoChip(
+                        label: "Latest Release",
+                        value: UtilsDate.format(_repository.releasePublishedDate!),
+                        icon: Icons.event_available_outlined,
+                      ),
+                    ),
+                  if (hasReleaseDate && hasGitDate) const SizedBox(width: 12),
+                  if (hasGitDate)
+                    Expanded(
+                      child: InfoChip(
+                        label: "Latest Git Update",
+                        value: UtilsDate.format(_repository.lastUpdate!),
+                        icon: Icons.history_outlined,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 12),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -308,42 +333,18 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
                 ],
               ),
             ),
-            if (hasReleaseDate || hasGitDate) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  if (hasReleaseDate)
-                    Expanded(
-                      child: InfoChip(
-                        label: "Latest Release",
-                        value: UtilsDate.format(_repository.releasePublishedDate!),
-                        icon: Icons.event_available_outlined,
-                      ),
-                    ),
-                  if (hasReleaseDate && hasGitDate) const SizedBox(width: 12),
-                  if (hasGitDate)
-                    Expanded(
-                      child: InfoChip(
-                        label: "Latest Git Update",
-                        value: UtilsDate.format(_repository.lastUpdate!),
-                        icon: Icons.history_outlined,
-                      ),
-                    ),
-                ],
-              ),
-            ],
             if (hasReleaseBody) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               ReleaseNotesCard(
                 releaseBody: _repository.releaseBody!,
                 onLinkTap: (href) => _launchPage(href),
                 onExpandTap: _openFullReleaseNotes,
               ),
             ],
-            const SizedBox(height: 10),
             Card(
               margin: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
+              color: colorscheme.surfaceContainer,
               child: Column(
                 children: [
                   if (_repository.releaseLink != null && _repository.releaseLink!.isNotEmpty) ...[
@@ -376,11 +377,11 @@ class _RepositoryDetailsPageState extends State<RepositoryDetailsPage> {
                     ListTile(
                       leading: CircleAvatar(
                         radius: 18,
-                        backgroundColor: colorscheme.secondaryContainer,
+                        backgroundColor: colorscheme.primaryContainer,
                         child: Icon(
                           Icons.code_rounded,
                           size: 20,
-                          color: colorscheme.onSecondaryContainer,
+                          color: colorscheme.onPrimaryContainer,
                         ),
                       ),
                       title: const Text(
